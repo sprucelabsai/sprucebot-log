@@ -1,0 +1,11 @@
+{
+	"javascript.validate.enable": false,
+	"typescript.validate.enable": false,
+	"flow.useNPMPackagedFlow": true,
+	"vsicons.presets.angular": false,
+	"prettier.useTabs": true,
+	"prettier.singleQuote": true,
+	"editor.formatOnSave": true,
+	"prettier.printWidth": 300,
+	"typescript.suggest.enabled": false
+}

@@ -1,0 +1,14 @@
+[ignore]
+.*/node_modules/babel-plugin-flow-runtime/.*
+.*/node_modules/config-chain/.*
+
+[include]
+
+[libs]
+
+[options]
+module.file_ext=.js
+module.file_ext=.json
+suppress_type=$FlowIssue
+suppress_type=@flowIgnore
+suppress_comment= \\(.\\|\n\\)*\\$\\(FlowFixMe\\|FlowIgnore\\)
