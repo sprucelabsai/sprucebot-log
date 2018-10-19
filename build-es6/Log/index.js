@@ -39,6 +39,7 @@ module.exports = class Log extends IsoLog {
 	                    
 	                       
 	                   
+	                        
 
 	constructor() {
 		super();
@@ -53,7 +54,7 @@ module.exports = class Log extends IsoLog {
 		this.metricsQueue = [];
 	}
 
-	setOptions(options                                                                                                                                                                                                         ) {
+	setOptions(options                                                                                                                                                                                                                                   ) {
 		super.setOptions(options);
 
 		if (options) {
@@ -92,6 +93,12 @@ module.exports = class Log extends IsoLog {
 				this.appEnv = options.appEnv;
 
 				this.adapter = this.getAdapter();
+			}
+
+			if (options.metricsEnabled === true) {
+				this.metricsEnabled = true;
+			} else {
+				this.metricsEnabled = false;
 			}
 		}
 	}
@@ -163,8 +170,14 @@ module.exports = class Log extends IsoLog {
 	}
 
 	async flushMetrics() {
+		if (!this.metricsEnabled) {
+			this.trace('Metrics disabled');
+			this.metricsQueue = [];
+			return;
+		}
+
 		if (!this.adapter) {
-			this.warn('flushMetrics: Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called');
+			this.warn('flushMetrics: ...Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called');
 		} else if (this.metricsQueue.length > 0) {
 			try {
 				await this.adapter.sendMetrics(this.metricsQueue);

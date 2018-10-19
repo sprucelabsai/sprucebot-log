@@ -1,8 +1,22 @@
-const os = require('os');
-
 module.exports = () => {
-	return (req, res, next) => {
-		res.on('finish', function() {
+	return (arg1, arg2, arg3) => {
+		let isKoa = false;
+		let next;
+		let req;
+		let res;
+
+		if (!next) {
+			isKoa = true;
+			res = arg1.res;
+			req = arg1.request;
+			next = arg2;
+		} else {
+			req = arg1;
+			res = arg2;
+			next = arg3;
+		}
+
+		res.on('finish', () => {
 			log.metric({
 				type: 'httpRequest',
 				event: 'httpRequest',
@@ -12,9 +26,9 @@ module.exports = () => {
 				fresh: req.fresh,
 				statusCode: res.statusCode,
 				userAgent: req.headers['user-agent'],
-				ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+				ip: req.headers['x-forwarded-for'] || (req.connection && req.connection.remoteAddress)
 			});
 		});
-		next();
+		return next();
 	};
 };

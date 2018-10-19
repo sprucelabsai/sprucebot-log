@@ -117,6 +117,12 @@ function (_IsoLog) {
           this.appEnv = options.appEnv;
           this.adapter = this.getAdapter();
         }
+
+        if (options.metricsEnabled === true) {
+          this.metricsEnabled = true;
+        } else {
+          this.metricsEnabled = false;
+        }
       }
     }
   }, {
@@ -205,55 +211,65 @@ function (_IsoLog) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (this.adapter) {
+                if (this.metricsEnabled) {
                   _context.next = 4;
                   break;
                 }
 
-                this.warn('flushMetrics: Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called');
-                _context.next = 17;
-                break;
+                this.trace('Metrics disabled');
+                this.metricsQueue = [];
+                return _context.abrupt("return");
 
               case 4:
-                if (!(this.metricsQueue.length > 0)) {
-                  _context.next = 16;
+                if (this.adapter) {
+                  _context.next = 8;
                   break;
                 }
 
-                _context.prev = 5;
-                _context.next = 8;
-                return this.adapter.sendMetrics(this.metricsQueue);
+                this.warn('flushMetrics: ...Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called');
+                _context.next = 21;
+                break;
 
               case 8:
+                if (!(this.metricsQueue.length > 0)) {
+                  _context.next = 20;
+                  break;
+                }
+
+                _context.prev = 9;
+                _context.next = 12;
+                return this.adapter.sendMetrics(this.metricsQueue);
+
+              case 12:
                 this.metricsQueue = [];
-                _context.next = 14;
+                _context.next = 18;
                 break;
 
-              case 11:
-                _context.prev = 11;
-                _context.t0 = _context["catch"](5);
+              case 15:
+                _context.prev = 15;
+                _context.t0 = _context["catch"](9);
                 this.warn(_context.t0);
 
-              case 14:
-                _context.next = 17;
+              case 18:
+                _context.next = 21;
                 break;
 
-              case 16:
+              case 20:
                 this.trace('flushMetrics: No metrics to send');
 
-              case 17:
+              case 21:
                 // Ensure we don't have a queue that gets out of control
                 if (this.metricsQueue.length > this.maxQueueLength) {
                   // Reset the queue
                   this.metricsQueue = [];
                 }
 
-              case 18:
+              case 22:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[5, 11]]);
+        }, _callee, this, [[9, 15]]);
       }));
 
       return function flushMetrics() {

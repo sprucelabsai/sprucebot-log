@@ -1,9 +1,23 @@
 "use strict";
 
-var os = require('os');
-
 module.exports = function () {
-  return function (req, res, next) {
+  return function (arg1, arg2, arg3) {
+    var isKoa = false;
+    var next;
+    var req;
+    var res;
+
+    if (!next) {
+      isKoa = true;
+      res = arg1.res;
+      req = arg1.request;
+      next = arg2;
+    } else {
+      req = arg1;
+      res = arg2;
+      next = arg3;
+    }
+
     res.on('finish', function () {
       log.metric({
         type: 'httpRequest',
@@ -14,9 +28,9 @@ module.exports = function () {
         fresh: req.fresh,
         statusCode: res.statusCode,
         userAgent: req.headers['user-agent'],
-        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        ip: req.headers['x-forwarded-for'] || req.connection && req.connection.remoteAddress
       });
     });
-    next();
+    return next();
   };
 };
