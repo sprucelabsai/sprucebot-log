@@ -52,26 +52,5 @@ module.exports = function (sequelize) {
     if (typeof cb === 'function') {
       return cb();
     }
-  }); // async afterUpdate(instance, hookOptions, cb) {
-  // 	try {
-  // 		log.debug(`${this.modelName} afterUpdate`);
-  // 		log.debug(instance.constructor.name);
-  // 		log.debug(hookOptions);
-  // 	} catch (e) {
-  // 		console.log(e);
-  // 	}
-  // 	if (typeof cb === 'function') {
-  // 		return cb();
-  // 	}
-  // },
-  // async afterDestroy(instance, hookOptions, cb) {
-  // 	try {
-  // 		// log.debug(`${this.modelName} afterDestroy`);
-  // 	} catch (e) {
-  // 		console.log(e);
-  // 	}
-  // 	if (typeof cb === 'function') {
-  // 		return cb();
-  // 	}
-  // }
+  });
 };

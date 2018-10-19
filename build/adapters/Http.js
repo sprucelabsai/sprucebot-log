@@ -28,9 +28,9 @@ function () {
     this.appKey = appKey;
     this.appEnv = appEnv;
 
-    if (CLIENT && window.METRICS_URL) {
+    if (!metricsUrl && CLIENT && window.METRICS_URL) {
       this.host = window.METRICS_URL;
-    } else if (!CLIENT && process.env.METRICS_URL) {
+    } else if (!metricsUrl && !CLIENT && process.env.METRICS_URL) {
       this.host = process.env.METRICS_URL;
     }
   }

@@ -18,7 +18,8 @@ var request = require('superagent');
 var fs;
 var CLIENT = typeof window !== 'undefined';
 
-if (!CLIENT) {// fs = require('fs');
+if (!CLIENT) {
+  fs = require('fs');
 }
 
 module.exports =
