@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/sprucelabsai/sprucebot-log/compare/v1.0.3...v1.0.4) (2018-10-19)
+
+
+### Bug Fixes
+
+* captitalization ([47f7aa1](https://github.com/sprucelabsai/sprucebot-log/commit/47f7aa1))
+
 ## [1.0.3](https://github.com/sprucelabsai/sprucebot-log/compare/v1.0.2...v1.0.3) (2018-10-19)
 
 ## [1.0.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.0.1...v1.0.2) (2018-10-19)
