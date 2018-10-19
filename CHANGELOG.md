@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.0.4...v1.1.0) (2018-10-19)
+
+
+### Features
+
+* support koa server for request middleware; fix some bugs ([2abc550](https://github.com/sprucelabsai/sprucebot-log/commit/2abc550))
+
 ## [1.0.4](https://github.com/sprucelabsai/sprucebot-log/compare/v1.0.3...v1.0.4) (2018-10-19)
 
 
