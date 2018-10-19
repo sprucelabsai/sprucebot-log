@@ -7,13 +7,15 @@ const SocketAdapter = require('../adapters/Sockets');
 const CLIENT = typeof window !== 'undefined';
 
 let os;
-let packageName = 'unknown';
-let packageVersion = 'unknown';
+let packageName;
+let packageVersion;
+let userAgent;
 
 if (CLIENT) {
 	os = {
 		hostname: () => ''
 	};
+	userAgent = typeof navigator !== 'undefined' && navigator && navigator.userAgent ? navigator.userAgent : 'unknown';
 } else {
 	os = require('os');
 	try {
@@ -33,6 +35,10 @@ module.exports = class Log extends IsoLog {
 	appKey: ?string;
 	appEnv: string;
 	maxQueueLength: number;
+	userAgent: string;
+	packageName: string;
+	packageVersion: string;
+	metricsUrl: string;
 
 	constructor() {
 		super();
@@ -47,7 +53,7 @@ module.exports = class Log extends IsoLog {
 		this.metricsQueue = [];
 	}
 
-	setOptions(options: { level?: string, flushAt?: number, flushIntervalSec?: number, appName?: string, appEnv?: string, appKey?: string }) {
+	setOptions(options: { level?: string, flushAt?: number, flushIntervalSec?: number, appName?: string, appEnv?: string, appKey?: string, userAgent: string, packageVersion: string, packageName: string, metricsUrl: string }) {
 		super.setOptions(options);
 
 		if (options) {
@@ -64,6 +70,22 @@ module.exports = class Log extends IsoLog {
 				this.flushInterval = +options.flushIntervalSec * 1000;
 			}
 
+			if (options.userAgent) {
+				this.userAgent = options.userAgent;
+			}
+
+			if (options.packageName) {
+				this.packageName = options.packageName;
+			}
+
+			if (options.packageVersion) {
+				this.packageVersion = options.packageVersion;
+			}
+
+			if (options.metricsUrl) {
+				this.metricsUrl = options.metricsUrl;
+			}
+
 			if (options.appName && options.appEnv) {
 				this.appName = options.appName;
 				this.appKey = options.appKey;
@@ -78,7 +100,8 @@ module.exports = class Log extends IsoLog {
 		return new HttpAdapter({
 			appName: this.appName,
 			appKey: this.appKey,
-			appEnv: this.appEnv
+			appEnv: this.appEnv,
+			metricsUrl: this.metricsUrl
 		});
 	}
 
@@ -98,6 +121,15 @@ module.exports = class Log extends IsoLog {
 			time = data.time;
 			hostname = data.hostname;
 			value = data.value;
+			if (data.packageName) {
+				packageName = data.packageName;
+			}
+			if (data.packageVersion) {
+				packageVersion = data.packageVersion;
+			}
+			if (data.userAgent) {
+				userAgent = data.userAgent;
+			}
 		}
 
 		if (!event) {
@@ -112,8 +144,15 @@ module.exports = class Log extends IsoLog {
 		if (!hostname) {
 			hostname = this.hostname;
 		}
+		if (!packageName) {
+			packageName = this.packageName;
+		}
+		if (!packageVersion) {
+			packageVersion = this.packageVersion;
+		}
 		this.metricsQueue.push({
 			...rest,
+			userAgent,
 			packageName,
 			packageVersion,
 			time,

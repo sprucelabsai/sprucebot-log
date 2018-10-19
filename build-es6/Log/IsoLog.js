@@ -8,7 +8,7 @@ let fs;
 const CLIENT = typeof window !== 'undefined';
 
 if (!CLIENT) {
-	fs = require('fs');
+	// fs = require('fs');
 }
 
 module.exports = class Log {

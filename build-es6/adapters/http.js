@@ -11,8 +11,8 @@ module.exports = class Http {
 	                
 	               
 
-	constructor({ appName, appKey, appEnv }                                                      ) {
-		this.host = 'https://metrics.sprucebot.com';
+	constructor({ appName, appKey, appEnv, metricsUrl }                                                                           ) {
+		this.host = metricsUrl || 'https://metrics.sprucebot.com';
 		this.appName = appName;
 		this.appKey = appKey;
 		this.appEnv = appEnv;
