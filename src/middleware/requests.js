@@ -5,7 +5,7 @@ module.exports = () => {
 		let req;
 		let res;
 
-		if (!next) {
+		if (!arg3) {
 			isKoa = true;
 			res = arg1.res;
 			req = arg1.request;

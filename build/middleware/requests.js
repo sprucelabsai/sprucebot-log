@@ -7,7 +7,7 @@ module.exports = function () {
     var req;
     var res;
 
-    if (!next) {
+    if (!arg3) {
       isKoa = true;
       res = arg1.res;
       req = arg1.request;
