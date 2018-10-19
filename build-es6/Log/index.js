@@ -219,25 +219,23 @@ module.exports = class Log extends IsoLog {
 		return hostname;
 	}
 
-	trackLog(level        , args     ) {}
+	trackLog(level        , args     ) {
+		this.metric(`log-${level}`);
+	}
 
 	trace() {
-		this.trackLog('trace', arguments);
 		this.doLog('trace', arguments);
 	}
 
 	debug() {
-		this.trackLog('debug', arguments);
 		this.doLog('debug', arguments);
 	}
 
 	log() {
-		this.trackLog('log', arguments);
 		this.doLog('log', arguments);
 	}
 
 	info() {
-		this.trackLog('info', arguments);
 		this.doLog('info', arguments);
 	}
 
@@ -262,7 +260,6 @@ module.exports = class Log extends IsoLog {
 	}
 
 	superInfo() {
-		this.trackLog('superInfo', arguments);
 		this.doLog('superInfo', arguments);
 	}
 };

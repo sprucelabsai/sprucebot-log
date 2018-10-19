@@ -304,29 +304,27 @@ function (_IsoLog) {
     }
   }, {
     key: "trackLog",
-    value: function trackLog(level, args) {}
+    value: function trackLog(level, args) {
+      this.metric("log-".concat(level));
+    }
   }, {
     key: "trace",
     value: function trace() {
-      this.trackLog('trace', arguments);
       this.doLog('trace', arguments);
     }
   }, {
     key: "debug",
     value: function debug() {
-      this.trackLog('debug', arguments);
       this.doLog('debug', arguments);
     }
   }, {
     key: "log",
     value: function log() {
-      this.trackLog('log', arguments);
       this.doLog('log', arguments);
     }
   }, {
     key: "info",
     value: function info() {
-      this.trackLog('info', arguments);
       this.doLog('info', arguments);
     }
   }, {
@@ -356,7 +354,6 @@ function (_IsoLog) {
   }, {
     key: "superInfo",
     value: function superInfo() {
-      this.trackLog('superInfo', arguments);
       this.doLog('superInfo', arguments);
     }
   }]);

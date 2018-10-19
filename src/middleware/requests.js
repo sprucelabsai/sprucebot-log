@@ -15,8 +15,12 @@ module.exports = () => {
 			res = arg2;
 			next = arg3;
 		}
+		const startHrTime = process.hrtime();
 
 		res.on('finish', () => {
+			const elapsedHrTime = process.hrtime(startHrTime);
+			const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
+
 			log.metric({
 				type: 'httpRequest',
 				event: 'httpRequest',
@@ -26,7 +30,8 @@ module.exports = () => {
 				fresh: req.fresh,
 				statusCode: res.statusCode,
 				userAgent: req.headers['user-agent'],
-				ip: req.headers['x-forwarded-for'] || (req.connection && req.connection.remoteAddress)
+				ip: req.headers['x-forwarded-for'] || (req.connection && req.connection.remoteAddress),
+				milliseconds: elapsedTimeInMs
 			});
 		});
 		return next();
