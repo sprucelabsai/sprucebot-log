@@ -1,8 +1,8 @@
 //      
 
 const IsoLog = require('./IsoLog');
-const HttpAdapter = require('../adapters/Http');
-const SocketAdapter = require('../adapters/Sockets');
+const HttpAdapter = require('../adapters/http');
+const SocketAdapter = require('../adapters/sockets');
 
 const CLIENT = typeof window !== 'undefined';
 
