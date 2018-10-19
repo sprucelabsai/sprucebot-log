@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.1.0...v1.2.0) (2018-10-19)
+
+
+### Features
+
+* capture ms on requests ([33f4c90](https://github.com/sprucelabsai/sprucebot-log/commit/33f4c90))
+
 # [1.1.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.0.4...v1.1.0) (2018-10-19)
 
 
