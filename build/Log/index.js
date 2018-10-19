@@ -26,9 +26,9 @@ var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/hel
 
 var IsoLog = require('./IsoLog');
 
-var HttpAdapter = require('../adapters/http');
+var HttpAdapter = require('../adapters/Http');
 
-var SocketAdapter = require('../adapters/sockets');
+var SocketAdapter = require('../adapters/Sockets');
 
 var CLIENT = typeof window !== 'undefined';
 var os;
