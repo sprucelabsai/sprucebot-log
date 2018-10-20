@@ -15,11 +15,10 @@ module.exports = () => {
 			res = arg2;
 			next = arg3;
 		}
-		const startHrTime = process.hrtime();
+		const startTime = log.timerStart();
 
 		res.on('finish', () => {
-			const elapsedHrTime = process.hrtime(startHrTime);
-			const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
+			const elapsedTimeInMs = log.timerEnd(startTime);
 
 			log.metric({
 				type: 'httpRequest',

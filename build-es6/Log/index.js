@@ -112,7 +112,15 @@ module.exports = class Log extends IsoLog {
 		});
 	}
 
-	audit() {}
+	timerStart() {
+		return process.hrtime();
+	}
+
+	timerEnd(timeStart                  ) {
+		const elapsedHrTime = process.hrtime(timeStart);
+		const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
+		return elapsedTimeInMs;
+	}
 
 	metric(data                 ) {
 		let time;

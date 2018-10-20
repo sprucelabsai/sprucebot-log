@@ -18,10 +18,9 @@ module.exports = function () {
       next = arg3;
     }
 
-    var startHrTime = process.hrtime();
+    var startTime = log.timerStart();
     res.on('finish', function () {
-      var elapsedHrTime = process.hrtime(startHrTime);
-      var elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
+      var elapsedTimeInMs = log.timerEnd(startTime);
       log.metric({
         type: 'httpRequest',
         event: 'httpRequest',

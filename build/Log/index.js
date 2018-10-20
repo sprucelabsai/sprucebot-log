@@ -136,8 +136,17 @@ function (_IsoLog) {
       });
     }
   }, {
-    key: "audit",
-    value: function audit() {}
+    key: "timerStart",
+    value: function timerStart() {
+      return process.hrtime();
+    }
+  }, {
+    key: "timerEnd",
+    value: function timerEnd(timeStart) {
+      var elapsedHrTime = process.hrtime(timeStart);
+      var elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
+      return elapsedTimeInMs;
+    }
   }, {
     key: "metric",
     value: function metric(data) {

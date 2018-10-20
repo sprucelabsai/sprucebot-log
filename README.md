@@ -30,18 +30,20 @@ And in terminal:
 
 - Collect and send metrics
 
-## Browser (client) Usage
+## Browser (client) Installation
 
 ```javascript
 const log = require('@sprucelabs/log');
 ```
 
-## NodeJS (server) Usage
+## NodeJS (server) Installation
 
 ```js
 const logger = require('@sprucelabs/log');
 const log = logger.log;
 ```
+
+## Usage
 
 ```js
 // After the logger is initialized, set some options
@@ -74,6 +76,20 @@ log.metric({
 	time: Date.now(), // The unix timestamp for this event (default is now)
 	hostname: window.location.hostname // The current hostname
 })
+```
+
+### Timers
+
+This library also provides a couple helper functions for timers:
+
+```js
+const startTime = log.timerStart();
+// Do some stuff
+const milliseconds = log.timerEnd(startTime);
+log.metric({
+	event: 'timeToDoSomething',
+	value: milliseconds
+});
 ```
 
 ## Additional NodeJS (server) Features
