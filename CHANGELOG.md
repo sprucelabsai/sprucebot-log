@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.2.1...v1.3.0) (2018-10-20)
+
+
+### Features
+
+* timer utilities ([d01be96](https://github.com/sprucelabsai/sprucebot-log/commit/d01be96))
+
 ## [1.2.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.2.0...v1.2.1) (2018-10-19)
 
 
