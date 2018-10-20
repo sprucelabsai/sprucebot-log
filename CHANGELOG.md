@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.2.0...v1.2.1) (2018-10-19)
+
+
+### Bug Fixes
+
+* express/koa detection ([9760b07](https://github.com/sprucelabsai/sprucebot-log/commit/9760b07))
+
 # [1.2.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.1.0...v1.2.0) (2018-10-19)
 
 
