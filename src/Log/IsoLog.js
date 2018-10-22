@@ -75,7 +75,6 @@ module.exports = class Log {
 	}
 
 	setOptions(options) {
-		console.log({ options });
 		if (options.level) {
 			this.setLevel(options.level);
 		}

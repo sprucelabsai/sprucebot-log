@@ -90,10 +90,6 @@ function () {
   (0, _createClass2.default)(Log, [{
     key: "setOptions",
     value: function setOptions(options) {
-      console.log({
-        options: options
-      });
-
       if (options.level) {
         this.setLevel(options.level);
       }
