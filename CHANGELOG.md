@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.3.1...v1.4.0) (2018-10-23)
+
+
+### Features
+
+* collect browser page load metrics ([968f86f](https://github.com/sprucelabsai/sprucebot-log/commit/968f86f))
+
 ## [1.3.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.3.0...v1.3.1) (2018-10-22)
 
 
