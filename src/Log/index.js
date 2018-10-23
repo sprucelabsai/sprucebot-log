@@ -120,6 +120,23 @@ module.exports = class Log extends IsoLog {
 		return getTimes();
 	}
 
+	routeChangeStart() {
+		this.routeChangeStartTime = Date.now();
+	}
+
+	routeChangeComplete() {
+		const diff = Date.now() - this.routeChangeStartTime;
+		if (typeof window !== 'undefined') {
+			const stats = getTimes();
+			this.metric({
+				type: 'browserPageLoadStats',
+				event: 'routeChange',
+				path: window.location.pathname,
+				loadTime: diff
+			});
+		}
+	}
+
 	getAdapter() {
 		return new HttpAdapter({
 			appName: this.appName,

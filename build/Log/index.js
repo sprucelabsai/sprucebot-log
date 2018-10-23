@@ -145,6 +145,26 @@ function (_IsoLog) {
       return getTimes();
     }
   }, {
+    key: "routeChangeStart",
+    value: function routeChangeStart() {
+      this.routeChangeStartTime = Date.now();
+    }
+  }, {
+    key: "routeChangeComplete",
+    value: function routeChangeComplete() {
+      var diff = Date.now() - this.routeChangeStartTime;
+
+      if (typeof window !== 'undefined') {
+        var stats = getTimes();
+        this.metric({
+          type: 'browserPageLoadStats',
+          event: 'routeChange',
+          path: window.location.pathname,
+          loadTime: diff
+        });
+      }
+    }
+  }, {
     key: "getAdapter",
     value: function getAdapter() {
       return new HttpAdapter({
