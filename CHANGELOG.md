@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.3.0...v1.3.1) (2018-10-22)
+
+
+### Bug Fixes
+
+* remove console.log ([e49f965](https://github.com/sprucelabsai/sprucebot-log/commit/e49f965))
+
 # [1.3.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.2.1...v1.3.0) (2018-10-20)
 
 
