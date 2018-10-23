@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.4.0...v1.5.0) (2018-10-23)
+
+
+### Features
+
+* add route change metrics ([0658fdf](https://github.com/sprucelabsai/sprucebot-log/commit/0658fdf))
+
 # [1.4.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.3.1...v1.4.0) (2018-10-23)
 
 
