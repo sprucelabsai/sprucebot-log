@@ -6,9 +6,9 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread"));
-
 var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread"));
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
@@ -29,6 +29,8 @@ var IsoLog = require('./IsoLog');
 var HttpAdapter = require('../adapters/Http');
 
 var SocketAdapter = require('../adapters/Sockets');
+
+var getTimes = require('../collectors/browser');
 
 var CLIENT = typeof window !== 'undefined';
 var os;
@@ -124,6 +126,23 @@ function (_IsoLog) {
           this.metricsEnabled = false;
         }
       }
+    }
+  }, {
+    key: "collectBrowserMetrics",
+    value: function collectBrowserMetrics() {
+      if (typeof window !== 'undefined') {
+        var stats = getTimes();
+        this.metric((0, _objectSpread2.default)({
+          type: 'browserPageLoadStats',
+          event: 'browserPageLoadStats',
+          path: window.location.pathname
+        }, stats));
+      }
+    }
+  }, {
+    key: "times",
+    value: function times() {
+      return getTimes();
     }
   }, {
     key: "getAdapter",

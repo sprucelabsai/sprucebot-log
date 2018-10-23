@@ -3,6 +3,7 @@
 const IsoLog = require('./IsoLog');
 const HttpAdapter = require('../adapters/Http');
 const SocketAdapter = require('../adapters/Sockets');
+const getTimes = require('../collectors/browser');
 
 const CLIENT = typeof window !== 'undefined';
 
@@ -101,6 +102,22 @@ module.exports = class Log extends IsoLog {
 				this.metricsEnabled = false;
 			}
 		}
+	}
+
+	collectBrowserMetrics() {
+		if (typeof window !== 'undefined') {
+			const stats = getTimes();
+			this.metric({
+				type: 'browserPageLoadStats',
+				event: 'browserPageLoadStats',
+				path: window.location.pathname,
+				...stats
+			});
+		}
+	}
+
+	times() {
+		return getTimes();
 	}
 
 	getAdapter() {
