@@ -1,3 +1,5 @@
+## [1.6.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.6.0...v1.6.1) (2018-11-02)
+
 # [1.6.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.5.0...v1.6.0) (2018-11-02)
 
 
