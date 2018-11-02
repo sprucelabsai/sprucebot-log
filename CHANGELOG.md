@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.6.1...v1.6.2) (2018-11-02)
+
+
+### Bug Fixes
+
+* remove duplicate flow definition ([c7a7b13](https://github.com/sprucelabsai/sprucebot-log/commit/c7a7b13))
+
 ## [1.6.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.6.0...v1.6.1) (2018-11-02)
 
 # [1.6.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.5.0...v1.6.0) (2018-11-02)
