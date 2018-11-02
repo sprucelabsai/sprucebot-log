@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.5.0...v1.6.0) (2018-11-02)
+
+
+### Features
+
+* turn off colors / fix: date off by 1 day ([25e012e](https://github.com/sprucelabsai/sprucebot-log/commit/25e012e))
+
 # [1.5.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.4.0...v1.5.0) (2018-10-23)
 
 
