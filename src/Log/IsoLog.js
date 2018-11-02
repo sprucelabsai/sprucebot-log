@@ -15,7 +15,6 @@ module.exports = class Log {
 	useTrace: boolean;
 	useSourcemaps: boolean;
 	useColors: boolean;
-	useColors: boolean;
 	level: string;
 	levels: Object;
 	sources: Object;

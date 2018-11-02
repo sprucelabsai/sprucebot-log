@@ -15,7 +15,6 @@ module.exports = class Log {
 	                  
 	                       
 	                   
-	                   
 	              
 	               
 	                
