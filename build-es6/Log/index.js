@@ -18,12 +18,15 @@ if (CLIENT) {
 	};
 	userAgent = typeof navigator !== 'undefined' && navigator && navigator.userAgent ? navigator.userAgent : 'unknown';
 } else {
-	os = require('os');
+	os = require('os'); // eslint-disable-line
 	try {
-		const packageJSON = require(`${process.env.PWD}/package.json`);
+		// $FlowIgnore
+		const packageJSON = require(`${process.env.PWD}/package.json`); // eslint-disable-line
 		packageName = packageJSON.name;
 		packageVersion = packageJSON.version;
-	} catch (e) {}
+	} catch (e) {
+		// Do nothing
+	}
 }
 
 module.exports = class Log extends IsoLog {
@@ -41,6 +44,7 @@ module.exports = class Log extends IsoLog {
 	                       
 	                   
 	                        
+	                            
 
 	constructor() {
 		super();
@@ -55,7 +59,7 @@ module.exports = class Log extends IsoLog {
 		this.metricsQueue = [];
 	}
 
-	setOptions(options                                                                                                                                                                                                                                   ) {
+	setOptions(options                                                                                                                                                                                                                                                        ) {
 		super.setOptions(options);
 
 		if (options) {
@@ -100,6 +104,12 @@ module.exports = class Log extends IsoLog {
 				this.metricsEnabled = true;
 			} else {
 				this.metricsEnabled = false;
+			}
+
+			if (options.useColors === false) {
+				this.useColors = false;
+			} else {
+				this.useColors = true;
 			}
 		}
 	}

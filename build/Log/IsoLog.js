@@ -8,8 +8,8 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-var chalk = require('chalk'); // Modified version of https://github.com/barbershop/iso-log
-
+// Modified version of https://github.com/barbershop/iso-log
+var chalk = require('chalk');
 
 var sourceMap = require('source-map');
 
@@ -19,7 +19,7 @@ var fs;
 var CLIENT = typeof window !== 'undefined';
 
 if (!CLIENT) {
-  fs = require('fs');
+  fs = require('fs'); // eslint-disable-line
 }
 
 module.exports =
@@ -80,9 +80,10 @@ function () {
     };
     this.useTrace = true;
     this.useSourcemaps = true;
-    this.sources = [];
-    this.sourceMaps = [];
-    this.originalPositionQueue = [];
+    this.sources = {};
+    this.sourceMaps = {};
+    this.originalPositionQueue = {};
+    this.useColors = true;
     global.sources = this.sources;
     global.sourceMaps = this.sourceMaps;
   }
@@ -104,6 +105,12 @@ function () {
         this.useSourcemaps = false;
       } else {
         this.useSourcemaps = true;
+      }
+
+      if (options.useColors === false) {
+        this.useColors = false;
+      } else {
+        this.useColors = true;
       }
     }
   }, {
@@ -210,7 +217,7 @@ function () {
         month = '0' + month;
       }
 
-      var day = now.getDate() + 1;
+      var day = now.getDate();
 
       if (day < 10) {
         day = '0' + day;
@@ -241,6 +248,10 @@ function () {
   }, {
     key: "colorize",
     value: function colorize(level, str, bold) {
+      if (!this.useColors) {
+        return str;
+      }
+
       var colorizedStr = str;
 
       if (CLIENT) {

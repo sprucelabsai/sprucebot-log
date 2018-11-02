@@ -67,5 +67,10 @@
 			"babel-module": {}
 		}
 	},
-	"globals": {}
+	"globals": {
+		"log": true,
+		"window": true,
+		"config": true,
+		"navigator": true
+	}
 }

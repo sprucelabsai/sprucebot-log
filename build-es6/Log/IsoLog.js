@@ -1,6 +1,6 @@
 //      
-const chalk = require('chalk');
 // Modified version of https://github.com/barbershop/iso-log
+const chalk = require('chalk');
 const sourceMap = require('source-map');
 const request = require('superagent');
 
@@ -8,10 +8,20 @@ let fs;
 const CLIENT = typeof window !== 'undefined';
 
 if (!CLIENT) {
-	fs = require('fs');
+	fs = require('fs'); // eslint-disable-line
 }
 
 module.exports = class Log {
+	                  
+	                       
+	                   
+	                   
+	              
+	               
+	                
+	                   
+	                              
+
 	constructor() {
 		this.levels = {
 			trace: {
@@ -67,14 +77,15 @@ module.exports = class Log {
 
 		this.useTrace = true;
 		this.useSourcemaps = true;
-		this.sources = [];
-		this.sourceMaps = [];
-		this.originalPositionQueue = [];
+		this.sources = {};
+		this.sourceMaps = {};
+		this.originalPositionQueue = {};
+		this.useColors = true;
 		global.sources = this.sources;
 		global.sourceMaps = this.sourceMaps;
 	}
 
-	setOptions(options) {
+	setOptions(options                                                                                      ) {
 		if (options.level) {
 			this.setLevel(options.level);
 		}
@@ -90,9 +101,15 @@ module.exports = class Log {
 		} else {
 			this.useSourcemaps = true;
 		}
+
+		if (options.useColors === false) {
+			this.useColors = false;
+		} else {
+			this.useColors = true;
+		}
 	}
 
-	setLevel(level) {
+	setLevel(level        ) {
 		switch (level) {
 			case 'trace':
 			case 'debug':
@@ -107,7 +124,7 @@ module.exports = class Log {
 		}
 	}
 
-	doLog(level, args) {
+	doLog(level        , args     ) {
 		if (this.levels[level] && this.levels[level].i >= this.levels[this.level].i) {
 			let thingToLog;
 
@@ -189,7 +206,7 @@ module.exports = class Log {
 		if (month < 10) {
 			month = '0' + month;
 		}
-		let day = now.getDate() + 1;
+		let day = now.getDate();
 		if (day < 10) {
 			day = '0' + day;
 		}
@@ -211,7 +228,10 @@ module.exports = class Log {
 		return nowStr;
 	}
 
-	colorize(level, str, bold) {
+	colorize(level        , str        , bold         ) {
+		if (!this.useColors) {
+			return str;
+		}
 		let colorizedStr = str;
 		if (CLIENT) {
 			let style = '';
@@ -249,7 +269,7 @@ module.exports = class Log {
 		return colorizedStr;
 	}
 
-	getLine() {
+	getLine()                   {
 		return new Promise(resolve => {
 			if (!this.useTrace) {
 				resolve();
@@ -351,7 +371,7 @@ module.exports = class Log {
 		this.doLog('superInfo', arguments);
 	}
 
-	getSource({ sourceRoot, sourceFile, mapFile, lineNumber, position }) {
+	getSource({ sourceRoot, sourceFile, mapFile, lineNumber, position })               {
 		return new Promise(resolve => {
 			const fullSource = `${sourceRoot}${sourceFile}`;
 			const fullMapSource = `${sourceRoot}${mapFile}`;
@@ -416,7 +436,7 @@ module.exports = class Log {
 		});
 	}
 
-	resolveQueue(fullSource) {
+	resolveQueue(fullSource        ) {
 		if (this.originalPositionQueue[fullSource]) {
 			this.originalPositionQueue[fullSource].forEach(queueItem => {
 				const queueOriginal = this.sourceMaps[fullSource].originalPositionFor({
@@ -430,7 +450,7 @@ module.exports = class Log {
 		this.originalPositionQueue[fullSource] = [];
 	}
 
-	decorateLogMessage(level, msg) {
+	decorateLogMessage(level        , msg        ) {
 		let logStr = msg;
 		switch (level) {
 			case 'info':

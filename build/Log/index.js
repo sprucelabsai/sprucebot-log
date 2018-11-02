@@ -46,14 +46,17 @@ if (CLIENT) {
   };
   userAgent = typeof navigator !== 'undefined' && navigator && navigator.userAgent ? navigator.userAgent : 'unknown';
 } else {
-  os = require('os');
+  os = require('os'); // eslint-disable-line
 
   try {
-    var packageJSON = require("".concat(process.env.PWD, "/package.json"));
+    // $FlowIgnore
+    var packageJSON = require("".concat(process.env.PWD, "/package.json")); // eslint-disable-line
+
 
     packageName = packageJSON.name;
     packageVersion = packageJSON.version;
-  } catch (e) {}
+  } catch (e) {// Do nothing
+  }
 }
 
 module.exports =
@@ -124,6 +127,12 @@ function (_IsoLog) {
           this.metricsEnabled = true;
         } else {
           this.metricsEnabled = false;
+        }
+
+        if (options.useColors === false) {
+          this.useColors = false;
+        } else {
+          this.useColors = true;
         }
       }
     }
