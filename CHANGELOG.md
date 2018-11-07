@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.6.2...v1.7.0) (2018-11-07)
+
+
+### Features
+
+* add server and client specific entry points instead of only relying on detection ([c3a2b01](https://github.com/sprucelabsai/sprucebot-log/commit/c3a2b01))
+
 ## [1.6.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.6.1...v1.6.2) (2018-11-02)
 
 

@@ -1,6 +1,6 @@
 {
 	"name": "@sprucelabs/log",
-	"version": "1.6.2",
+	"version": "1.7.0",
 	"publishConfig": {
 		"access": "public",
 		"tag": "beta"
