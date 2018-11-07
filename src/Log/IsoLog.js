@@ -5,7 +5,7 @@ const sourceMap = require('source-map');
 const request = require('superagent');
 
 let fs;
-const CLIENT = typeof window !== 'undefined';
+const CLIENT = typeof window !== 'undefined' || typeof __webpack_require__ === 'function';
 
 if (!CLIENT) {
 	fs = require('fs'); // eslint-disable-line

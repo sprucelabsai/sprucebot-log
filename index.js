@@ -1,4 +1,4 @@
-const CLIENT = typeof window !== 'undefined';
+const CLIENT = typeof window !== 'undefined' || typeof __webpack_require__ === 'function';
 
 if (CLIENT) {
 	const Log = require('./build/Log');
