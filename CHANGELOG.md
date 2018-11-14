@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.7.0...v1.7.1) (2018-11-14)
+
+
+### Bug Fixes
+
+* change required node version to just >=8 ([a10d9e6](https://github.com/sprucelabsai/sprucebot-log/commit/a10d9e6))
+
 # [1.7.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.6.2...v1.7.0) (2018-11-07)
 
 
