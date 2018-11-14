@@ -12,8 +12,8 @@
 	"description": "Sprucebot Logger",
 	"main": "index.js",
 	"engines": {
-		"node": ">=8 <9",
-		"npm": ">=5 <=5.7.1"
+		"node": ">=8",
+		"npm": ">=5"
 	},
 	"scripts": {
 		"clean": "rm -rf build/* build-es6/*",
