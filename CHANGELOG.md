@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.7.1...v1.7.2) (2018-11-16)
+
+
+### Bug Fixes
+
+* add additional existence checks ([b601bf3](https://github.com/sprucelabsai/sprucebot-log/commit/b601bf3))
+
 ## [1.7.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.7.0...v1.7.1) (2018-11-14)
 
 
