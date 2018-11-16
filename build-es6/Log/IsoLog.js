@@ -436,17 +436,23 @@ module.exports = class Log {
 	}
 
 	resolveQueue(fullSource        ) {
-		if (this.originalPositionQueue[fullSource]) {
-			this.originalPositionQueue[fullSource].forEach(queueItem => {
-				const queueOriginal = this.sourceMaps[fullSource].originalPositionFor({
-					line: parseInt(queueItem.line, 10),
-					column: parseInt(queueItem.column, 10)
+		try {
+			if (this.originalPositionQueue[fullSource]) {
+				this.originalPositionQueue[fullSource].forEach(queueItem => {
+					if (this.sourceMaps && this.sourceMaps[fullSource]) {
+						const queueOriginal = this.sourceMaps[fullSource].originalPositionFor({
+							line: parseInt(queueItem.line, 10),
+							column: parseInt(queueItem.column, 10)
+						});
+						queueItem.resolve(queueOriginal);
+					}
 				});
-				queueItem.resolve(queueOriginal);
-			});
-		}
+			}
 
-		this.originalPositionQueue[fullSource] = [];
+			this.originalPositionQueue[fullSource] = [];
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	decorateLogMessage(level        , msg        ) {

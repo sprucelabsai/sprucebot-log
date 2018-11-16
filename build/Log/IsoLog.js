@@ -501,18 +501,24 @@ function () {
     value: function resolveQueue(fullSource) {
       var _this4 = this;
 
-      if (this.originalPositionQueue[fullSource]) {
-        this.originalPositionQueue[fullSource].forEach(function (queueItem) {
-          var queueOriginal = _this4.sourceMaps[fullSource].originalPositionFor({
-            line: parseInt(queueItem.line, 10),
-            column: parseInt(queueItem.column, 10)
+      try {
+        if (this.originalPositionQueue[fullSource]) {
+          this.originalPositionQueue[fullSource].forEach(function (queueItem) {
+            if (_this4.sourceMaps && _this4.sourceMaps[fullSource]) {
+              var queueOriginal = _this4.sourceMaps[fullSource].originalPositionFor({
+                line: parseInt(queueItem.line, 10),
+                column: parseInt(queueItem.column, 10)
+              });
+
+              queueItem.resolve(queueOriginal);
+            }
           });
+        }
 
-          queueItem.resolve(queueOriginal);
-        });
+        this.originalPositionQueue[fullSource] = [];
+      } catch (e) {
+        console.log(e);
       }
-
-      this.originalPositionQueue[fullSource] = [];
     }
   }, {
     key: "decorateLogMessage",
