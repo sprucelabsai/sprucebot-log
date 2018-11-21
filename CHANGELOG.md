@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.7.2...v1.8.0) (2018-11-21)
+
+
+### Features
+
+* Ability to capture FE error logs ([bddb5d6](https://github.com/sprucelabsai/sprucebot-log/commit/bddb5d6))
+
 ## [1.7.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.7.1...v1.7.2) (2018-11-16)
 
 
