@@ -20,6 +20,8 @@ module.exports = class Log {
 	sources: Object;
 	sourceMaps: Object;
 	originalPositionQueue: Object;
+	logs: Array<any>;
+	userAgent: string;
 
 	constructor() {
 		this.levels = {
@@ -82,9 +84,10 @@ module.exports = class Log {
 		this.useColors = true;
 		global.sources = this.sources;
 		global.sourceMaps = this.sourceMaps;
+		this.logs = [];
 	}
 
-	setOptions(options: { level?: string, useTrace?: boolean, useSourcemaps?: boolean, useColors?: boolean }) {
+	setOptions(options: { level?: string, useTrace?: boolean, useSourcemaps?: boolean, useColors?: boolean, userAgent: string }) {
 		if (options.level) {
 			this.setLevel(options.level);
 		}
@@ -106,6 +109,8 @@ module.exports = class Log {
 		} else {
 			this.useColors = true;
 		}
+
+		this.userAgent = options.userAgent || 'unknown';
 	}
 
 	setLevel(level: string) {
@@ -123,20 +128,25 @@ module.exports = class Log {
 		}
 	}
 
-	doLog(level: string, args: any) {
+	doLog(level: string, args: any, saveLog: boolean) {
 		if (this.levels[level] && this.levels[level].i >= this.levels[this.level].i) {
 			let thingToLog;
+			let rawThingToLog;
 
 			if (args && args.length === 1) {
 				if (typeof args[0] !== 'string') {
 					thingToLog = [args[0]];
+					rawThingToLog = [args[0]];
 				} else {
 					thingToLog = args[0];
+					rawThingToLog = args[0];
 				}
 			} else {
 				thingToLog = [];
+				rawThingToLog = [];
 				for (let i = 0, len = args.length; i < len; i += 1) {
 					thingToLog.push(args[i]);
+					rawThingToLog.push(args[i]);
 				}
 			}
 
@@ -164,9 +174,9 @@ module.exports = class Log {
 						}
 					}
 
-					let aboutStr = callerFunc ? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): ` : `(${level.toUpperCase()} | ${now} | ${thingType}): `;
+					const rawAboutStr = callerFunc ? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): ` : `(${level.toUpperCase()} | ${now} | ${thingType}): `;
 
-					aboutStr = this.decorateLogMessage(level, aboutStr);
+					const aboutStr = this.decorateLogMessage(level, rawAboutStr);
 
 					const colorizedLevel = this.colorize(level, aboutStr);
 
@@ -188,6 +198,16 @@ module.exports = class Log {
 						consoleMethod.call(this, thingToLog);
 					} else {
 						consoleMethod.apply(this, thingToLog);
+					}
+
+					if (saveLog && CLIENT && this.logs && Array.isArray(this.logs)) {
+						this.logs.push({
+							userAgent: this.userAgent,
+							path: window && window.location && window.location.pathname ? window.location.pathname : 'unknown',
+							about: rawAboutStr,
+							level,
+							item: rawThingToLog
+						});
 					}
 				})
 				.catch(e => {

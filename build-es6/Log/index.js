@@ -45,6 +45,8 @@ module.exports = class Log extends IsoLog {
 	                   
 	                        
 	                            
+	                       
+	                
 
 	constructor() {
 		super();
@@ -54,7 +56,7 @@ module.exports = class Log extends IsoLog {
 
 		this.hostname = this.getHostname();
 
-		setInterval(this.flushMetrics.bind(this), this.flushInterval);
+		setInterval(this.flushData.bind(this), this.flushInterval);
 
 		this.metricsQueue = [];
 	}
@@ -96,8 +98,6 @@ module.exports = class Log extends IsoLog {
 				this.appName = options.appName;
 				this.appKey = options.appKey;
 				this.appEnv = options.appEnv;
-
-				this.adapter = this.getAdapter();
 			}
 
 			if (options.metricsEnabled === true) {
@@ -111,6 +111,18 @@ module.exports = class Log extends IsoLog {
 			} else {
 				this.useColors = true;
 			}
+
+			if (options.captureFELogs === true) {
+				this.captureFELogs = true;
+			} else {
+				this.captureFELogs = false;
+			}
+
+			if (options.logUrl) {
+				this.logUrl = options.logUrl;
+			}
+
+			this.adapter = this.getAdapter();
 		}
 	}
 
@@ -152,7 +164,8 @@ module.exports = class Log extends IsoLog {
 			appName: this.appName,
 			appKey: this.appKey,
 			appEnv: this.appEnv,
-			metricsUrl: this.metricsUrl
+			metricsUrl: this.metricsUrl,
+			logUrl: this.logUrl
 		});
 	}
 
@@ -221,6 +234,11 @@ module.exports = class Log extends IsoLog {
 		});
 	}
 
+	flushData() {
+		this.flushMetrics();
+		this.flushLogs();
+	}
+
 	async flushMetrics() {
 		if (!this.metricsEnabled) {
 			this.trace('Metrics disabled');
@@ -245,6 +263,33 @@ module.exports = class Log extends IsoLog {
 		if (this.metricsQueue.length > this.maxQueueLength) {
 			// Reset the queue
 			this.metricsQueue = [];
+		}
+	}
+
+	async flushLogs() {
+		if (!this.captureFELogs) {
+			this.trace('FE Metrics Capture Disabled');
+			this.logs = [];
+			return;
+		}
+
+		if (!this.adapter) {
+			this.warn('flushLogs: ...Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called');
+		} else if (this.logs.length > 0) {
+			try {
+				await this.adapter.sendLogs(this.logs);
+			} catch (e) {
+				this.warn(e);
+			}
+			this.logs = [];
+		} else {
+			this.trace('flushLogs: No metrics to send');
+		}
+
+		// Ensure we don't have a queue that gets out of control
+		if (this.logs.length > this.maxQueueLength) {
+			// Reset the queue
+			this.logs = [];
 		}
 	}
 
@@ -293,22 +338,22 @@ module.exports = class Log extends IsoLog {
 
 	warn() {
 		this.trackLog('warn', arguments);
-		this.doLog('warn', arguments);
+		this.doLog('warn', arguments, this.captureFELogs);
 	}
 
 	error() {
 		this.trackLog('error', arguments);
-		this.doLog('error', arguments);
+		this.doLog('error', arguments, this.captureFELogs);
 	}
 
 	crit() {
 		this.trackLog('error', arguments);
-		this.doLog('error', arguments);
+		this.doLog('error', arguments, this.captureFELogs);
 	}
 
 	fatal() {
 		this.trackLog('error', arguments);
-		this.doLog('error', arguments);
+		this.doLog('error', arguments, this.captureFELogs);
 	}
 
 	superInfo() {
