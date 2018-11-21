@@ -1,5 +1,6 @@
 //      
                                               
+                                        
 
 const request = require('superagent');
 
@@ -7,12 +8,14 @@ const CLIENT = typeof window !== 'undefined';
 
 module.exports = class Http {
 	             
+	               
 	                
 	                
 	               
 
-	constructor({ appName, appKey, appEnv, metricsUrl }                                                                           ) {
+	constructor({ appName, appKey, appEnv, metricsUrl, logUrl }                                                                                            ) {
 		this.host = metricsUrl || 'https://metrics.sprucebot.com';
+		this.logUrl = logUrl;
 		this.appName = appName;
 		this.appKey = appKey;
 		this.appEnv = appEnv;
@@ -32,5 +35,20 @@ module.exports = class Http {
 			})
 			.timeout(3000)
 			.send(metrics);
+	}
+	async sendLogs(logs            ) {
+		if (!this.logUrl) {
+			console.warn('Unable to send logs because log host is not set');
+			return;
+		}
+		await request
+			.post(this.logUrl)
+			.set({
+				'x-app-name': this.appName,
+				'x-app-key': this.appKey,
+				'x-app-env': this.appEnv
+			})
+			.timeout(3000)
+			.send(logs);
 	}
 };

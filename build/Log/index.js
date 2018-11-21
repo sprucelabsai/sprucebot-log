@@ -75,7 +75,7 @@ function (_IsoLog) {
     _this.flushInterval = 10000;
     _this.maxQueueLength = 1000;
     _this.hostname = _this.getHostname();
-    setInterval(_this.flushMetrics.bind((0, _assertThisInitialized2.default)((0, _assertThisInitialized2.default)(_this))), _this.flushInterval);
+    setInterval(_this.flushData.bind((0, _assertThisInitialized2.default)((0, _assertThisInitialized2.default)(_this))), _this.flushInterval);
     _this.metricsQueue = [];
     return _this;
   }
@@ -120,7 +120,6 @@ function (_IsoLog) {
           this.appName = options.appName;
           this.appKey = options.appKey;
           this.appEnv = options.appEnv;
-          this.adapter = this.getAdapter();
         }
 
         if (options.metricsEnabled === true) {
@@ -134,6 +133,18 @@ function (_IsoLog) {
         } else {
           this.useColors = true;
         }
+
+        if (options.captureFELogs === true) {
+          this.captureFELogs = true;
+        } else {
+          this.captureFELogs = false;
+        }
+
+        if (options.logUrl) {
+          this.logUrl = options.logUrl;
+        }
+
+        this.adapter = this.getAdapter();
       }
     }
   }, {
@@ -180,7 +191,8 @@ function (_IsoLog) {
         appName: this.appName,
         appKey: this.appKey,
         appEnv: this.appEnv,
-        metricsUrl: this.metricsUrl
+        metricsUrl: this.metricsUrl,
+        logUrl: this.logUrl
       });
     }
   }, {
@@ -259,6 +271,12 @@ function (_IsoLog) {
       }));
     }
   }, {
+    key: "flushData",
+    value: function flushData() {
+      this.flushMetrics();
+      this.flushLogs();
+    }
+  }, {
     key: "flushMetrics",
     value: function () {
       var _flushMetrics = (0, _asyncToGenerator2.default)(
@@ -334,6 +352,81 @@ function (_IsoLog) {
       };
     }()
   }, {
+    key: "flushLogs",
+    value: function () {
+      var _flushLogs = (0, _asyncToGenerator2.default)(
+      /*#__PURE__*/
+      _regenerator.default.mark(function _callee2() {
+        return _regenerator.default.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                if (this.captureFELogs) {
+                  _context2.next = 4;
+                  break;
+                }
+
+                this.trace('FE Metrics Capture Disabled');
+                this.logs = [];
+                return _context2.abrupt("return");
+
+              case 4:
+                if (this.adapter) {
+                  _context2.next = 8;
+                  break;
+                }
+
+                this.warn('flushLogs: ...Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called');
+                _context2.next = 21;
+                break;
+
+              case 8:
+                if (!(this.logs.length > 0)) {
+                  _context2.next = 20;
+                  break;
+                }
+
+                _context2.prev = 9;
+                _context2.next = 12;
+                return this.adapter.sendLogs(this.logs);
+
+              case 12:
+                _context2.next = 17;
+                break;
+
+              case 14:
+                _context2.prev = 14;
+                _context2.t0 = _context2["catch"](9);
+                this.warn(_context2.t0);
+
+              case 17:
+                this.logs = [];
+                _context2.next = 21;
+                break;
+
+              case 20:
+                this.trace('flushLogs: No metrics to send');
+
+              case 21:
+                // Ensure we don't have a queue that gets out of control
+                if (this.logs.length > this.maxQueueLength) {
+                  // Reset the queue
+                  this.logs = [];
+                }
+
+              case 22:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[9, 14]]);
+      }));
+
+      return function flushLogs() {
+        return _flushLogs.apply(this, arguments);
+      };
+    }()
+  }, {
     key: "getHostname",
     value: function getHostname() {
       var hostname = 'unknown';
@@ -388,25 +481,25 @@ function (_IsoLog) {
     key: "warn",
     value: function warn() {
       this.trackLog('warn', arguments);
-      this.doLog('warn', arguments);
+      this.doLog('warn', arguments, this.captureFELogs);
     }
   }, {
     key: "error",
     value: function error() {
       this.trackLog('error', arguments);
-      this.doLog('error', arguments);
+      this.doLog('error', arguments, this.captureFELogs);
     }
   }, {
     key: "crit",
     value: function crit() {
       this.trackLog('error', arguments);
-      this.doLog('error', arguments);
+      this.doLog('error', arguments, this.captureFELogs);
     }
   }, {
     key: "fatal",
     value: function fatal() {
       this.trackLog('error', arguments);
-      this.doLog('error', arguments);
+      this.doLog('error', arguments, this.captureFELogs);
     }
   }, {
     key: "superInfo",

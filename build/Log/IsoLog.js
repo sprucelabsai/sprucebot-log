@@ -86,6 +86,7 @@ function () {
     this.useColors = true;
     global.sources = this.sources;
     global.sourceMaps = this.sourceMaps;
+    this.logs = [];
   }
 
   (0, _createClass2.default)(Log, [{
@@ -112,6 +113,8 @@ function () {
       } else {
         this.useColors = true;
       }
+
+      this.userAgent = options.userAgent || 'unknown';
     }
   }, {
     key: "setLevel",
@@ -132,23 +135,28 @@ function () {
     }
   }, {
     key: "doLog",
-    value: function doLog(level, args) {
+    value: function doLog(level, args, saveLog) {
       var _this = this;
 
       if (this.levels[level] && this.levels[level].i >= this.levels[this.level].i) {
         var thingToLog;
+        var rawThingToLog;
 
         if (args && args.length === 1) {
           if (typeof args[0] !== 'string') {
             thingToLog = [args[0]];
+            rawThingToLog = [args[0]];
           } else {
             thingToLog = args[0];
+            rawThingToLog = args[0];
           }
         } else {
           thingToLog = [];
+          rawThingToLog = [];
 
           for (var i = 0, len = args.length; i < len; i += 1) {
             thingToLog.push(args[i]);
+            rawThingToLog.push(args[i]);
           }
         }
 
@@ -176,8 +184,9 @@ function () {
             }
           }
 
-          var aboutStr = callerFunc ? "(".concat(level.toUpperCase(), " | ").concat(now, " | ").concat(callerFunc, " | ").concat(thingType, "): ") : "(".concat(level.toUpperCase(), " | ").concat(now, " | ").concat(thingType, "): ");
-          aboutStr = _this.decorateLogMessage(level, aboutStr);
+          var rawAboutStr = callerFunc ? "(".concat(level.toUpperCase(), " | ").concat(now, " | ").concat(callerFunc, " | ").concat(thingType, "): ") : "(".concat(level.toUpperCase(), " | ").concat(now, " | ").concat(thingType, "): ");
+
+          var aboutStr = _this.decorateLogMessage(level, rawAboutStr);
 
           var colorizedLevel = _this.colorize(level, aboutStr);
 
@@ -199,6 +208,16 @@ function () {
             consoleMethod.call(_this, thingToLog);
           } else {
             consoleMethod.apply(_this, thingToLog);
+          }
+
+          if (saveLog && CLIENT && _this.logs && Array.isArray(_this.logs)) {
+            _this.logs.push({
+              userAgent: _this.userAgent,
+              path: window && window.location && window.location.pathname ? window.location.pathname : 'unknown',
+              about: rawAboutStr,
+              level: level,
+              item: rawThingToLog
+            });
           }
         }).catch(function (e) {
           console.warn(e);
