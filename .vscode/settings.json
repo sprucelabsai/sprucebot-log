@@ -3,9 +3,7 @@
 	"typescript.validate.enable": false,
 	"flow.useNPMPackagedFlow": true,
 	"vsicons.presets.angular": false,
-	"prettier.useTabs": true,
-	"prettier.singleQuote": true,
 	"editor.formatOnSave": true,
-	"prettier.printWidth": 300,
+	"prettier.eslintIntegration": true,
 	"typescript.suggest.enabled": false
 }
