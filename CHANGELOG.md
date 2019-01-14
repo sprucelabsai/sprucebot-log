@@ -1,3 +1,13 @@
+## [1.8.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.8.0...v1.8.1) (2019-01-14)
+
+
+### Bug Fixes
+
+* add build artifacts back to package ([eb60643](https://github.com/sprucelabsai/sprucebot-log/commit/eb60643))
+* build before release ([c7173d9](https://github.com/sprucelabsai/sprucebot-log/commit/c7173d9))
+* cross-editor prettier support ([f8981b2](https://github.com/sprucelabsai/sprucebot-log/commit/f8981b2))
+* delete build files ([d1cb284](https://github.com/sprucelabsai/sprucebot-log/commit/d1cb284))
+
 # [1.8.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.7.2...v1.8.0) (2018-11-21)
 
 
