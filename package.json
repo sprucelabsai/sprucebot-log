@@ -11,6 +11,12 @@
 	},
 	"description": "Sprucebot Logger",
 	"main": "index.js",
+	"files": [
+		"build",
+		"build-es6",
+		"client.js",
+		"server.js"
+	],
 	"engines": {
 		"node": ">=8",
 		"npm": ">=5"

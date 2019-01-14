@@ -1,7 +1,7 @@
 {
-	"extends": ["airbnb-base", "plugin:flowtype/recommended"],
+	"extends": ["airbnb-base", "plugin:flowtype/recommended", "prettier"],
 	"parser": "babel-eslint",
-	"plugins": ["flowtype"],
+	"plugins": ["flowtype", "prettier"],
 	"parserOptions": {},
 	"rules": {
 		"import/default": 0,
@@ -60,7 +60,15 @@
 				}
 			}
 		],
-		"prefer-rest-params": 0
+		"prefer-rest-params": 0,
+		"prettier/prettier": [
+			"error",
+			{
+				"singleQuote": true,
+				"useTabs": true,
+				"semi": false
+			}
+		]
 	},
 	"settings": {
 		"import/resolver": {
