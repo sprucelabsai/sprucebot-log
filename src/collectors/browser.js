@@ -3,15 +3,19 @@
 // Based on https://github.com/addyosmani/timing.js
 module.exports = function getTimes() {
 	if (typeof window === 'undefined') {
-		return {};
+		return {}
 	}
-	const performance = window.performance || window.webkitPerformance || window.msPerformance || window.mozPerformance;
+	const performance =
+		window.performance ||
+		window.webkitPerformance ||
+		window.msPerformance ||
+		window.mozPerformance
 
 	if (typeof performance === 'undefined' || !performance.timing) {
-		return {};
+		return {}
 	}
 
-	const timing = performance.timing;
+	const timing = performance.timing
 	const api = {
 		firstPaintTime: -1,
 		firstPaint: -1,
@@ -26,53 +30,55 @@ module.exports = function getTimes() {
 		requestTime: -1,
 		initDomTreeTime: -1,
 		loadEventTime: -1
-	};
+	}
 
 	if (timing) {
 		// Time to first paint
 		if (api.firstPaint < 0) {
 			// All times are relative times to the start time within the
 			// same objects
-			let firstPaint = -1;
+			let firstPaint = -1
 
 			// IE
 			if (typeof timing.msFirstPaint === 'number') {
-				firstPaint = timing.msFirstPaint;
-				api.firstPaintTime = firstPaint - timing.navigationStart;
+				firstPaint = timing.msFirstPaint
+				api.firstPaintTime = firstPaint - timing.navigationStart
 			} else if (performance.getEntriesByName !== undefined) {
-				const firstPaintPerformanceEntry = performance.getEntriesByName('first-paint');
+				const firstPaintPerformanceEntry = performance.getEntriesByName(
+					'first-paint'
+				)
 				if (firstPaintPerformanceEntry.length === 1) {
-					const firstPaintTime = firstPaintPerformanceEntry[0].startTime;
-					firstPaint = performance.timeOrigin + firstPaintTime;
-					api.firstPaintTime = firstPaintTime;
+					const firstPaintTime = firstPaintPerformanceEntry[0].startTime
+					firstPaint = performance.timeOrigin + firstPaintTime
+					api.firstPaintTime = firstPaintTime
 				}
 			}
-			api.firstPaint = firstPaint;
+			api.firstPaint = firstPaint
 		}
 
 		// Total time from start to load
-		api.loadTime = timing.loadEventEnd - timing.fetchStart;
+		api.loadTime = timing.loadEventEnd - timing.fetchStart
 		// Time spent constructing the DOM tree
-		api.domReadyTime = timing.domComplete - timing.domInteractive;
+		api.domReadyTime = timing.domComplete - timing.domInteractive
 		// Time consumed preparing the new page
-		api.readyStart = timing.fetchStart - timing.navigationStart;
+		api.readyStart = timing.fetchStart - timing.navigationStart
 		// Time spent during redirection
-		api.redirectTime = timing.redirectEnd - timing.redirectStart;
+		api.redirectTime = timing.redirectEnd - timing.redirectStart
 		// AppCache
-		api.appcacheTime = timing.domainLookupStart - timing.fetchStart;
+		api.appcacheTime = timing.domainLookupStart - timing.fetchStart
 		// Time spent unloading documents
-		api.unloadEventTime = timing.unloadEventEnd - timing.unloadEventStart;
+		api.unloadEventTime = timing.unloadEventEnd - timing.unloadEventStart
 		// DNS query time
-		api.lookupDomainTime = timing.domainLookupEnd - timing.domainLookupStart;
+		api.lookupDomainTime = timing.domainLookupEnd - timing.domainLookupStart
 		// TCP connection time
-		api.connectTime = timing.connectEnd - timing.connectStart;
+		api.connectTime = timing.connectEnd - timing.connectStart
 		// Time spent during the request
-		api.requestTime = timing.responseEnd - timing.requestStart;
+		api.requestTime = timing.responseEnd - timing.requestStart
 		// Request to completion of the DOM loading
-		api.initDomTreeTime = timing.domInteractive - timing.responseEnd;
+		api.initDomTreeTime = timing.domInteractive - timing.responseEnd
 		// Load event time
-		api.loadEventTime = timing.loadEventEnd - timing.loadEventStart;
+		api.loadEventTime = timing.loadEventEnd - timing.loadEventStart
 	}
 
-	return api;
-};
+	return api
+}

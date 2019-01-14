@@ -1,13 +1,13 @@
 // @flow
-const os = require('os');
+const os = require('os')
 
 function collectMetrics() {
 	if (typeof log === 'undefined') {
-		console.log('⚠️ Unable to collect stats. Sprucebot logger not initialized.');
-		return;
+		console.log('⚠️ Unable to collect stats. Sprucebot logger not initialized.')
+		return
 	}
-	const loadAvg = os.loadavg();
-	const processMem = process.memoryUsage();
+	const loadAvg = os.loadavg()
+	const processMem = process.memoryUsage()
 	log.metric({
 		type: 'nodeStats',
 		event: 'nodeStats',
@@ -25,12 +25,12 @@ function collectMetrics() {
 		processHeapUsed: processMem.heapUsed,
 		processExternal: processMem.external,
 		processVersion: process.version
-	});
+	})
 }
 
 module.exports = (interval?: number) => {
 	if (typeof interval === 'undefined' || !interval || +interval <= 0) {
-		interval = 30000;
+		interval = 30000
 	}
-	setInterval(collectMetrics, interval);
-};
+	setInterval(collectMetrics, interval)
+}

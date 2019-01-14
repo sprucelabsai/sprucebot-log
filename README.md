@@ -33,14 +33,14 @@ And in terminal:
 ## Browser (client) Installation
 
 ```javascript
-const log = require('@sprucelabs/log');
+const log = require('@sprucelabs/log')
 ```
 
 ## NodeJS (server) Installation
 
 ```js
-const logger = require('@sprucelabs/log');
-const log = logger.log;
+const logger = require('@sprucelabs/log')
+const log = logger.log
 ```
 
 ## Usage
@@ -83,13 +83,13 @@ log.metric({
 This library also provides a couple helper functions for timers:
 
 ```js
-const startTime = log.timerStart();
+const startTime = log.timerStart()
 // Do some stuff
-const milliseconds = log.timerEnd(startTime);
+const milliseconds = log.timerEnd(startTime)
 log.metric({
 	event: 'timeToDoSomething',
 	value: milliseconds
-});
+})
 ```
 
 ## Additional NodeJS (server) Features
@@ -99,7 +99,7 @@ log.metric({
 We can collect server metrics like CPU and memory usage automatically. After you've initialized the logger and called `setOptions()` just call:
 
 ```js
-logger.nodeMetrics();
+logger.nodeMetrics()
 ```
 
 ### Request Metrics (for express-based apps)
@@ -107,9 +107,9 @@ logger.nodeMetrics();
 We can collect stats on the type of HTTP requests being made by installing the request middleware. After you've initialized the logger and called `setOptions()` initialize your express app and the add the middleware:
 
 ```js
-const app = express();
+const app = express()
 
-app.use(logger.middleware.requests());
+app.use(logger.middleware.requests())
 ```
 
 ### Sequelize Middleware Metrics Collection
@@ -117,9 +117,9 @@ app.use(logger.middleware.requests());
 We can collect stats on create/update/delete methods of models. After you've initialized the logger and called `setOptions()` initialize Sequelize and add the metrics hooks:
 
 ```js
-const sequelize = new Sequelize(this.uri, this.options);
+const sequelize = new Sequelize(this.uri, this.options)
 
-logger.sequelizeHooks(sequelize);
+logger.sequelizeHooks(sequelize)
 ```
 
 ### Options
@@ -147,20 +147,20 @@ If the level specified is `info`, then `info`, `warn`, `error`, and `superInfo` 
 ### Logging Examples
 
 ```javascript
-log.trace('log at level trace');
-log.debug('log at level debug');
-log.log('log at level log');
-log.info('log at level info');
-log.warn('log at level warn');
-log.error('log at level error');
-log.superInfo('log at level error');
+log.trace('log at level trace')
+log.debug('log at level debug')
+log.log('log at level log')
+log.info('log at level info')
+log.warn('log at level warn')
+log.error('log at level error')
+log.superInfo('log at level error')
 
-log.crit('log at level error'); // alias of 'error'
-log.fatal('log at level error'); // alias of 'error'
+log.crit('log at level error') // alias of 'error'
+log.fatal('log at level error') // alias of 'error'
 
 // Anything that can be passed to console.log can be passed to the logger
-log.debug({ some: 'object here' });
-log.debug('multiple things', 'getting logged here', { some: 'object here' });
+log.debug({ some: 'object here' })
+log.debug('multiple things', 'getting logged here', { some: 'object here' })
 ```
 
 ### Sourcemaps and Webpack
@@ -169,7 +169,7 @@ For source maps to properly work you'll need to make sure you're generating them
 
 ```javascript
 {
-	devtool: 'cheap-module-source-map';
+	devtool: 'cheap-module-source-map'
 }
 ```
 
@@ -177,6 +177,6 @@ If you're using webpack and receive a `Module not found: Error: Can't resolve 'f
 
 ```javascript
 node: {
-	fs: 'empty';
+	fs: 'empty'
 }
 ```

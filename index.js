@@ -1,15 +1,16 @@
-const CLIENT = typeof window !== 'undefined' || typeof __webpack_require__ === 'function';
+const CLIENT =
+	typeof window !== 'undefined' || typeof __webpack_require__ === 'function'
 
 if (CLIENT) {
-	const Log = require('./build/Log');
-	module.exports = new Log();
+	const Log = require('./build/Log')
+	module.exports = new Log()
 } else {
-	const Log = require('./build-es6/Log');
-	module.exports.log = new Log();
+	const Log = require('./build-es6/Log')
+	module.exports.log = new Log()
 	module.exports.middleware = {
 		requests: require('./build-es6/middleware/requests'),
 		koaRequests: require('./build-es6/middleware/koaRequests')
-	};
-	module.exports.nodeMetrics = require('./build-es6/collectors/node');
-	module.exports.sequelizeHooks = require('./build-es6/sequelize/hooks');
+	}
+	module.exports.nodeMetrics = require('./build-es6/collectors/node')
+	module.exports.sequelizeHooks = require('./build-es6/sequelize/hooks')
 }

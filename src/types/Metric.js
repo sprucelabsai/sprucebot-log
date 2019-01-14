@@ -3,4 +3,4 @@ export type Metric = {
 	event: string,
 	value: number,
 	hostname: string
-};
+}

@@ -1,27 +1,28 @@
 // @flow
 // Modified version of https://github.com/barbershop/iso-log
-const chalk = require('chalk');
-const sourceMap = require('source-map');
-const request = require('superagent');
+const chalk = require('chalk')
+const sourceMap = require('source-map')
+const request = require('superagent')
 
-let fs;
-const CLIENT = typeof window !== 'undefined' || typeof __webpack_require__ === 'function';
+let fs
+const CLIENT =
+	typeof window !== 'undefined' || typeof __webpack_require__ === 'function'
 
 if (!CLIENT) {
-	fs = require('fs'); // eslint-disable-line
+	fs = require('fs') // eslint-disable-line
 }
 
 module.exports = class Log {
-	useTrace: boolean;
-	useSourcemaps: boolean;
-	useColors: boolean;
-	level: string;
-	levels: Object;
-	sources: Object;
-	sourceMaps: Object;
-	originalPositionQueue: Object;
-	logs: Array<any>;
-	userAgent: string;
+	useTrace: boolean
+	useSourcemaps: boolean
+	useColors: boolean
+	level: string
+	levels: Object
+	sources: Object
+	sourceMaps: Object
+	originalPositionQueue: Object
+	logs: Array<any>
+	userAgent: string
 
 	constructor() {
 		this.levels = {
@@ -74,43 +75,49 @@ module.exports = class Log {
 				bgHex: null,
 				bgHexFallBack: null
 			}
-		};
+		}
 
-		this.useTrace = true;
-		this.useSourcemaps = true;
-		this.sources = {};
-		this.sourceMaps = {};
-		this.originalPositionQueue = {};
-		this.useColors = true;
-		global.sources = this.sources;
-		global.sourceMaps = this.sourceMaps;
-		this.logs = [];
+		this.useTrace = true
+		this.useSourcemaps = true
+		this.sources = {}
+		this.sourceMaps = {}
+		this.originalPositionQueue = {}
+		this.useColors = true
+		global.sources = this.sources
+		global.sourceMaps = this.sourceMaps
+		this.logs = []
 	}
 
-	setOptions(options: { level?: string, useTrace?: boolean, useSourcemaps?: boolean, useColors?: boolean, userAgent: string }) {
+	setOptions(options: {
+		level?: string,
+		useTrace?: boolean,
+		useSourcemaps?: boolean,
+		useColors?: boolean,
+		userAgent: string
+	}) {
 		if (options.level) {
-			this.setLevel(options.level);
+			this.setLevel(options.level)
 		}
 
 		if (options.useTrace === false) {
-			this.useTrace = false;
+			this.useTrace = false
 		} else {
-			this.useTrace = true;
+			this.useTrace = true
 		}
 
 		if (options.useSourcemaps === false) {
-			this.useSourcemaps = false;
+			this.useSourcemaps = false
 		} else {
-			this.useSourcemaps = true;
+			this.useSourcemaps = true
 		}
 
 		if (options.useColors === false) {
-			this.useColors = false;
+			this.useColors = false
 		} else {
-			this.useColors = true;
+			this.useColors = true
 		}
 
-		this.userAgent = options.userAgent || 'unknown';
+		this.userAgent = options.userAgent || 'unknown'
 	}
 
 	setLevel(level: string) {
@@ -120,151 +127,163 @@ module.exports = class Log {
 			case 'info':
 			case 'warn':
 			case 'error':
-				this.level = level;
-				break;
+				this.level = level
+				break
 			default:
-				this.level = 'warn';
-				break;
+				this.level = 'warn'
+				break
 		}
 	}
 
 	doLog(level: string, args: any, saveLog: boolean) {
-		if (this.levels[level] && this.levels[level].i >= this.levels[this.level].i) {
-			let thingToLog;
-			let rawThingToLog;
+		if (
+			this.levels[level] &&
+			this.levels[level].i >= this.levels[this.level].i
+		) {
+			let thingToLog
+			let rawThingToLog
 
 			if (args && args.length === 1) {
 				if (typeof args[0] !== 'string') {
-					thingToLog = [args[0]];
-					rawThingToLog = [args[0]];
+					thingToLog = [args[0]]
+					rawThingToLog = [args[0]]
 				} else {
-					thingToLog = args[0];
-					rawThingToLog = args[0];
+					thingToLog = args[0]
+					rawThingToLog = args[0]
 				}
 			} else {
-				thingToLog = [];
-				rawThingToLog = [];
+				thingToLog = []
+				rawThingToLog = []
 				for (let i = 0, len = args.length; i < len; i += 1) {
-					thingToLog.push(args[i]);
-					rawThingToLog.push(args[i]);
+					thingToLog.push(args[i])
+					rawThingToLog.push(args[i])
 				}
 			}
 
-			const now = this.getDatetimeString();
+			const now = this.getDatetimeString()
 
-			const thingType = typeof thingToLog;
+			const thingType = typeof thingToLog
 			this.getLine()
 				.then(callerFunc => {
-					let isString = false;
+					let isString = false
 					if (thingType === 'string') {
-						thingToLog = this.colorize(level, thingToLog, true);
-						isString = true;
+						thingToLog = this.colorize(level, thingToLog, true)
+						isString = true
 					}
 
 					// default noop
-					let consoleMethod = () => {};
+					let consoleMethod = () => {}
 					if (typeof console !== 'undefined') {
-						if (!CLIENT && level === 'debug' && typeof console.log !== 'undefined') {
+						if (
+							!CLIENT &&
+							level === 'debug' &&
+							typeof console.log !== 'undefined'
+						) {
 							// Node has a dummy 'debug' console method (in v8) that doesn't print anything to console.  Use console.log instead
-							consoleMethod = console.log;
+							consoleMethod = console.log
 						} else if (typeof console[level] !== 'undefined') {
-							consoleMethod = console[level];
+							consoleMethod = console[level]
 						} else if (typeof console.log !== 'undefined') {
-							consoleMethod = console.log;
+							consoleMethod = console.log
 						}
 					}
 
-					const rawAboutStr = callerFunc ? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): ` : `(${level.toUpperCase()} | ${now} | ${thingType}): `;
+					const rawAboutStr = callerFunc
+						? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): `
+						: `(${level.toUpperCase()} | ${now} | ${thingType}): `
 
-					const aboutStr = this.decorateLogMessage(level, rawAboutStr);
+					const aboutStr = this.decorateLogMessage(level, rawAboutStr)
 
-					const colorizedLevel = this.colorize(level, aboutStr);
+					const colorizedLevel = this.colorize(level, aboutStr)
 
 					if (isString) {
 						if (CLIENT) {
-							thingToLog[0] = colorizedLevel[0] + thingToLog[0];
-							thingToLog[2] = thingToLog[1];
-							thingToLog[1] = colorizedLevel[1];
+							thingToLog[0] = colorizedLevel[0] + thingToLog[0]
+							thingToLog[2] = thingToLog[1]
+							thingToLog[1] = colorizedLevel[1]
 						} else {
-							thingToLog = colorizedLevel + thingToLog;
+							thingToLog = colorizedLevel + thingToLog
 						}
 					} else if (CLIENT) {
-						console.log.apply(this, colorizedLevel);
+						console.log.apply(this, colorizedLevel)
 					} else {
-						console.log.call(this, colorizedLevel);
+						console.log.call(this, colorizedLevel)
 					}
 
 					if (!CLIENT && thingType === 'string') {
-						consoleMethod.call(this, thingToLog);
+						consoleMethod.call(this, thingToLog)
 					} else {
-						consoleMethod.apply(this, thingToLog);
+						consoleMethod.apply(this, thingToLog)
 					}
 
 					if (saveLog && CLIENT && this.logs && Array.isArray(this.logs)) {
 						this.logs.push({
 							userAgent: this.userAgent,
-							path: window && window.location && window.location.pathname ? window.location.pathname : 'unknown',
+							path:
+								window && window.location && window.location.pathname
+									? window.location.pathname
+									: 'unknown',
 							about: rawAboutStr,
 							level,
 							item: rawThingToLog
-						});
+						})
 					}
 				})
 				.catch(e => {
-					console.warn(e);
-				});
+					console.warn(e)
+				})
 		} else {
 			// console.log('**** LOG LEVEL NOT MET');
 		}
 	}
 
 	getDatetimeString() {
-		const now = new Date();
-		const year = now.getFullYear();
-		let month = now.getMonth() + 1;
+		const now = new Date()
+		const year = now.getFullYear()
+		let month = now.getMonth() + 1
 		if (month < 10) {
-			month = '0' + month;
+			month = '0' + month
 		}
-		let day = now.getDate();
+		let day = now.getDate()
 		if (day < 10) {
-			day = '0' + day;
+			day = '0' + day
 		}
-		let hour = now.getHours();
+		let hour = now.getHours()
 		if (hour < 10) {
-			hour = '0' + hour;
+			hour = '0' + hour
 		}
-		let minute = now.getMinutes();
+		let minute = now.getMinutes()
 		if (minute < 10) {
-			minute = '0' + minute;
+			minute = '0' + minute
 		}
-		let second = now.getSeconds();
+		let second = now.getSeconds()
 		if (second < 10) {
-			second = '0' + second;
+			second = '0' + second
 		}
-		const millisecond = now.getMilliseconds();
-		const nowStr = `${year}-${month}-${day} ${hour}:${minute}:${second}:${millisecond}`;
+		const millisecond = now.getMilliseconds()
+		const nowStr = `${year}-${month}-${day} ${hour}:${minute}:${second}:${millisecond}`
 
-		return nowStr;
+		return nowStr
 	}
 
 	colorize(level: string, str: string, bold: boolean) {
 		if (!this.useColors) {
-			return str;
+			return str
 		}
-		let colorizedStr = str;
+		let colorizedStr = str
 		if (CLIENT) {
-			let style = '';
+			let style = ''
 			if (this.levels[level].bgHex) {
-				style += `background: ${this.levels[level].bgHex};`;
+				style += `background: ${this.levels[level].bgHex};`
 			}
 			if (this.levels[level].hex) {
-				style += `color: ${this.levels[level].hex};`;
+				style += `color: ${this.levels[level].hex};`
 			}
 			if (bold) {
-				style += `font-weight: bold;`;
+				style += `font-weight: bold;`
 			}
 
-			colorizedStr = [`%c${str}`, style];
+			colorizedStr = [`%c${str}`, style]
 		} else {
 			// if (chalk.hex) {
 			// 	if (this.levels[level].bgHex) {
@@ -275,52 +294,54 @@ module.exports = class Log {
 			// 	}
 			// } else {
 			if (this.levels[level].bgHexFallBack) {
-				colorizedStr = chalk[this.levels[level].bgHexFallBack](colorizedStr);
+				colorizedStr = chalk[this.levels[level].bgHexFallBack](colorizedStr)
 			}
 			if (this.levels[level].hexFallBack) {
-				colorizedStr = chalk[this.levels[level].hexFallBack](colorizedStr);
+				colorizedStr = chalk[this.levels[level].hexFallBack](colorizedStr)
 			}
 			// }
 			if (bold) {
-				colorizedStr = chalk.bold(colorizedStr);
+				colorizedStr = chalk.bold(colorizedStr)
 			}
 		}
-		return colorizedStr;
+		return colorizedStr
 	}
 
 	getLine(): Promise<?string> {
 		return new Promise(resolve => {
 			if (!this.useTrace) {
-				resolve();
+				resolve()
 			}
 
-			let callerFunc = '';
+			let callerFunc = ''
 			try {
-				throw new Error();
+				throw new Error()
 			} catch (e) {
-				const matches = e.stack.match(/\sat[^\n]*\n/g);
-				let depth = 0;
+				const matches = e.stack.match(/\sat[^\n]*\n/g)
+				let depth = 0
 
 				for (let i = 0, len = matches.length; i < len; i += 1) {
 					if (matches[i].indexOf('at Log.getLine') > -1) {
-						depth = i + 3;
-						break;
+						depth = i + 3
+						break
 					}
 				}
 
 				if (matches && matches[depth]) {
-					const matches2 = matches[depth].match(/at (.*)\((.*\/)(.*\.js):([^:]*):([^:]*)\)\n$/);
+					const matches2 = matches[depth].match(
+						/at (.*)\((.*\/)(.*\.js):([^:]*):([^:]*)\)\n$/
+					)
 					if (matches2 && matches2[1]) {
-						const sourceRoot = matches2[2];
-						const sourceFile = matches2[3];
-						const mapFile = `${sourceFile}.map`;
-						const lineNumber = matches2[4];
-						const position = matches2[5];
+						const sourceRoot = matches2[2]
+						const sourceFile = matches2[3]
+						const mapFile = `${sourceFile}.map`
+						const lineNumber = matches2[4]
+						const position = matches2[5]
 
 						if (!this.useSourcemaps) {
 							// Do not try to resolve from sourcemap.  Just use
-							callerFunc = `${sourceFile}:${lineNumber}:}`;
-							return resolve(callerFunc);
+							callerFunc = `${sourceFile}:${lineNumber}:}`
+							return resolve(callerFunc)
 						}
 
 						this.getSource({
@@ -331,128 +352,140 @@ module.exports = class Log {
 							position
 						}).then(original => {
 							if (original) {
-								const originalMatches = original.source.match(/([^/]+)$/);
-								let originalFile = '';
+								const originalMatches = original.source.match(/([^/]+)$/)
+								let originalFile = ''
 								if (originalMatches && originalMatches[1]) {
-									originalFile = originalMatches[1];
+									originalFile = originalMatches[1]
 								}
 
-								callerFunc = `${originalFile}:${original.line}:${original.column}`;
-								return resolve(callerFunc);
+								callerFunc = `${originalFile}:${original.line}:${
+									original.column
+								}`
+								return resolve(callerFunc)
 							}
 
-							callerFunc = `${matches2[1]} | ${matches2[2]}`;
-							return resolve(callerFunc);
-						});
+							callerFunc = `${matches2[1]} | ${matches2[2]}`
+							return resolve(callerFunc)
+						})
 					} else {
-						return resolve();
+						return resolve()
 					}
 				} else {
-					return resolve();
+					return resolve()
 				}
 			}
-		});
+		})
 	}
 
 	trace() {
-		this.doLog('trace', arguments);
+		this.doLog('trace', arguments)
 	}
 
 	debug() {
-		this.doLog('debug', arguments);
+		this.doLog('debug', arguments)
 	}
 
 	log() {
-		this.doLog('log', arguments);
+		this.doLog('log', arguments)
 	}
 
 	info() {
-		this.doLog('info', arguments);
+		this.doLog('info', arguments)
 	}
 
 	warn() {
-		this.doLog('warn', arguments);
+		this.doLog('warn', arguments)
 	}
 
 	error() {
-		this.doLog('error', arguments);
+		this.doLog('error', arguments)
 	}
 
 	crit() {
-		this.doLog('error', arguments);
+		this.doLog('error', arguments)
 	}
 
 	fatal() {
-		this.doLog('error', arguments);
+		this.doLog('error', arguments)
 	}
 
 	superInfo() {
-		this.doLog('superInfo', arguments);
+		this.doLog('superInfo', arguments)
 	}
 
-	getSource({ sourceRoot, sourceFile, mapFile, lineNumber, position }): Promise<any> {
+	getSource({
+		sourceRoot,
+		sourceFile,
+		mapFile,
+		lineNumber,
+		position
+	}): Promise<any> {
 		return new Promise(resolve => {
-			const fullSource = `${sourceRoot}${sourceFile}`;
-			const fullMapSource = `${sourceRoot}${mapFile}`;
+			const fullSource = `${sourceRoot}${sourceFile}`
+			const fullMapSource = `${sourceRoot}${mapFile}`
 			if (!this.sources[fullSource]) {
-				this.sources[fullSource] = true;
+				this.sources[fullSource] = true
 
 				if (CLIENT) {
 					request.get(fullMapSource).end((err, res) => {
 						if (err || !res.ok) {
-							console.warn(err);
-							return resolve();
+							console.warn(err)
+							return resolve()
 						}
-						this.sources[fullSource] = res.body;
-						this.sourceMaps[fullSource] = new sourceMap.SourceMapConsumer(this.sources[fullSource]);
+						this.sources[fullSource] = res.body
+						this.sourceMaps[fullSource] = new sourceMap.SourceMapConsumer(
+							this.sources[fullSource]
+						)
 						const original = this.sourceMaps[fullSource].originalPositionFor({
 							line: parseInt(lineNumber, 10),
 							column: parseInt(position, 10)
-						});
+						})
 
-						resolve(original);
-						this.resolveQueue(fullSource);
-					});
+						resolve(original)
+						this.resolveQueue(fullSource)
+					})
 				} else {
 					// Server
 					if (!fs) {
-						return resolve();
+						return resolve()
 					}
 					fs.readFile(fullMapSource, 'utf8', (err, data) => {
 						if (err) {
-							resolve();
-							this.resolveQueue(fullSource);
-							return;
+							resolve()
+							this.resolveQueue(fullSource)
+							return
 						}
-						this.sources[fullSource] = data;
-						this.sourceMaps[fullSource] = new sourceMap.SourceMapConsumer(this.sources[fullSource]);
+						this.sources[fullSource] = data
+						this.sourceMaps[fullSource] = new sourceMap.SourceMapConsumer(
+							this.sources[fullSource]
+						)
 						const original = this.sourceMaps[fullSource].originalPositionFor({
 							line: parseInt(lineNumber, 10),
 							column: parseInt(position, 10)
-						});
+						})
 
-						resolve(original);
-						this.resolveQueue(fullSource);
-					});
+						resolve(original)
+						this.resolveQueue(fullSource)
+					})
 				}
 			} else if (!this.sourceMaps[fullSource]) {
 				if (!this.originalPositionQueue[fullSource]) {
-					this.originalPositionQueue[fullSource] = [];
+					this.originalPositionQueue[fullSource] = []
 				}
 				this.originalPositionQueue[fullSource].push({
 					resolve,
 					line: lineNumber,
 					column: position
-				});
+				})
 			} else {
 				const original = this.sourceMaps[fullSource].originalPositionFor({
 					line: parseInt(lineNumber, 10),
 					column: parseInt(position, 10)
-				});
+				})
 
-				return resolve(original);
+				return resolve(original)
 			}
-		});
+		})
 	}
 
 	resolveQueue(fullSource: string) {
@@ -460,49 +493,51 @@ module.exports = class Log {
 			if (this.originalPositionQueue[fullSource]) {
 				this.originalPositionQueue[fullSource].forEach(queueItem => {
 					if (this.sourceMaps && this.sourceMaps[fullSource]) {
-						const queueOriginal = this.sourceMaps[fullSource].originalPositionFor({
+						const queueOriginal = this.sourceMaps[
+							fullSource
+						].originalPositionFor({
 							line: parseInt(queueItem.line, 10),
 							column: parseInt(queueItem.column, 10)
-						});
-						queueItem.resolve(queueOriginal);
+						})
+						queueItem.resolve(queueOriginal)
 					}
-				});
+				})
 			}
 
-			this.originalPositionQueue[fullSource] = [];
+			this.originalPositionQueue[fullSource] = []
 		} catch (e) {
-			console.log(e);
+			console.log(e)
 		}
 	}
 
 	decorateLogMessage(level: string, msg: string) {
-		let logStr = msg;
+		let logStr = msg
 		switch (level) {
 			case 'info':
-				logStr = 'ℹ️  ' + msg;
-				break;
+				logStr = 'ℹ️  ' + msg
+				break
 
 			case 'debug':
-				logStr = '❇️  ' + msg;
-				break;
+				logStr = '❇️  ' + msg
+				break
 
 			case 'warn':
-				logStr = '⚠️  ' + msg;
-				break;
+				logStr = '⚠️  ' + msg
+				break
 
 			case 'error':
 			case 'crit':
 			case 'fatal':
-				logStr = '💥  ' + msg;
-				break;
+				logStr = '💥  ' + msg
+				break
 
 			case 'superInfo':
-				logStr = '🤖 🤖 🤖  ' + msg;
-				break;
+				logStr = '🤖 🤖 🤖  ' + msg
+				break
 
 			default:
-				break;
+				break
 		}
-		return logStr;
+		return logStr
 	}
-};
+}

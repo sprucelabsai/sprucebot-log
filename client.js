@@ -1,3 +1,3 @@
-const Log = require('./build/Log');
+const Log = require('./build/Log')
 
-module.exports = new Log();
+module.exports = new Log()
