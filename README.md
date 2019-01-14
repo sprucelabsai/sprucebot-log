@@ -36,6 +36,14 @@ And in terminal:
 const log = require('@sprucelabs/log')
 ```
 
+## Babel installation with flow support
+
+```javascript
+import log from '@sprucelabs/log/flow-client'
+```
+
+- Assumes you have a `@babel/preset-flow` properly configured.
+
 ## NodeJS (server) Installation
 
 ```js

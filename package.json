@@ -12,9 +12,11 @@
 	"description": "Sprucebot Logger",
 	"main": "index.js",
 	"files": [
+		"src",
 		"build",
 		"build-es6",
 		"client.js",
+		"flow-client.js",
 		"server.js"
 	],
 	"engines": {
