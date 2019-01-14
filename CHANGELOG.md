@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.8.1...v1.8.2) (2019-01-14)
+
+
+### Bug Fixes
+
+* apply prettier updates for all files ([6c7e0e4](https://github.com/sprucelabsai/sprucebot-log/commit/6c7e0e4))
+
 ## [1.8.1](https://github.com/sprucelabsai/sprucebot-log/compare/v1.8.0...v1.8.1) (2019-01-14)
 
 
