@@ -28,12 +28,14 @@ And in terminal:
 
 - Sourcemap support
 
-- Collect and send metrics
+- Collect and send metrics from the browser to your server
+
+- Integration with [winston](https://github.com/winstonjs/winston) for server side logs
 
 ## Browser (client) Installation
 
 ```javascript
-const log = require('@sprucelabs/log')
+const log = require('@sprucelabs/log/client')
 ```
 
 ## NodeJS (server) Installation
@@ -46,22 +48,26 @@ const log = logger.log
 ## Usage
 
 ```js
-// After the logger is initialized, set some options
+// After the logger is initialized, set some options.
 log.setOptions({
-	level: 'debug',
-	useTrace: true,
-	useSourcemaps: true,
-	appName: 'myskill', // You choose an app name. This will bucket your metrics together
-	appEnv: 'production' // Set the current environment which will allow us to segment metrics from different environments.
-	// SERVER OPTION ONLY! Your app key should only be set when using this from your server. This should be treated like a password and NEVER exposed publicly
+	level: 'debug', // (default: 'warn')
+	useTrace: false, // (default: false) If true, the logger will attempt to log the filename and line number where the log originated. THIS SHOULD ONLY BE SET true in development environments. Setting it to true has performance implications.
+	useSourcemaps: false, // (default: false) Whether to try using sourcemaps. You will also need to set useTrace=true. THIS SHOULD ONLY BE SET true in development environments. Setting it to true has performance implications.
+	traceTreeDepth: 3, // (default: 3) If useTrace=true, this sets the max number path levels to output with the filename
+	useColors: true, // (default: true) Colorize log messages
+	asJSON: false, // (default: false) Output log messages as JSON (server side only)
+	formatters: undefined, // (default: see IsoLog.js setupWinston() method) Array of custom formatters to use for server side logs. https://github.com/winstonjs/winston#formats
+	transports: undefined, // (default: [new winston.transports.Console()]) Array of custom transports to use for server side logs. https://github.com/winstonjs/winston#transports
+	appName: 'myskill', // (default: undefined) You choose an app name. This will bucket your metrics together
+	appEnv: 'production' // (default: undefined) Set the current environment which will allow us to segment metrics from different environments.
+	// (default: undefined) SERVER OPTION ONLY! Your app key should only be set when using this from your server. This should be treated like a password and NEVER exposed publicly
 	appKey: 'ec858f58-0978-4fa7-8cdb-704902f30692'
-	// Optionally set the following parameters
-	flushAt: 10, // The number of metrics to collect before sending them (default 10)
-	flushIntervalSec: 10, // How often to send metrics (if any have been collected) (default 10)
-	userAgent: navigator.userAgent(), // The user agent making the request
-	packageName: 'myskill', // Your app's package name
-	packageVersion: 'v1.4.34', // Your apps's package version
-	metricsUrl: 'https://metrics.sprucebot.com' // The server where metrics are sent
+	flushAt: 10, // (default: 10) The number of metrics to collect before sending them (default 10)
+	flushIntervalSec: 10, // (default: 10) How often to send metrics (if any have been collected) (default 10)
+	userAgent: navigator.userAgent(), // (default: undefined) The user agent making the request
+	packageName: 'myskill', // (default: undefined) Your app's package name
+	packageVersion: 'v1.4.34', // (default: undefined) Your apps's package version
+	metricsUrl: 'https://metrics.sprucebot.com' // (default: 'https://metrics.sprucebot.com') The server where metrics are sent
 });
 
 log.debug('All set!');

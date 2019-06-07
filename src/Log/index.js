@@ -1,5 +1,5 @@
 // @flow
-
+const debug = require('debug')('@sprucelabs/log')
 const IsoLog = require('./IsoLog')
 const HttpAdapter = require('../adapters/Http')
 const SocketAdapter = require('../adapters/Sockets')
@@ -29,6 +29,8 @@ if (CLIENT) {
 		packageVersion = packageJSON.version
 	} catch (e) {
 		// Do nothing
+		debug('Unable to parse package.json')
+		debug(e)
 	}
 }
 
@@ -66,6 +68,8 @@ module.exports = class Log extends IsoLog {
 
 	setOptions(options: {
 		level?: string,
+		formatters?: Array<any>,
+		transports?: Array<any>,
 		flushAt?: number,
 		flushIntervalSec?: number,
 		appName?: string,
@@ -222,7 +226,7 @@ module.exports = class Log extends IsoLog {
 
 		if (!event) {
 			// $FlowIgnore
-			this.warn('Unable to collect metric because "event" was not specified')
+			debug('Unable to collect metric because "event" was not specified')
 			return
 		}
 
@@ -251,19 +255,21 @@ module.exports = class Log extends IsoLog {
 	}
 
 	flushData() {
+		debug('Logger: flushing data')
 		this.flushMetrics()
 		this.flushLogs()
 	}
 
 	async flushMetrics() {
+		debug('Logger: flushing metrics')
 		if (!this.metricsEnabled) {
-			this.trace('Metrics disabled')
+			debug('Metrics disabled')
 			this.metricsQueue = []
 			return
 		}
 
 		if (!this.adapter) {
-			this.warn(
+			debug(
 				'flushMetrics: ...Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called'
 			)
 		} else if (this.metricsQueue.length > 0) {
@@ -271,10 +277,10 @@ module.exports = class Log extends IsoLog {
 				await this.adapter.sendMetrics(this.metricsQueue)
 				this.metricsQueue = []
 			} catch (e) {
-				this.warn(e)
+				debug(e)
 			}
 		} else {
-			this.trace('flushMetrics: No metrics to send')
+			debug('flushMetrics: No metrics to send')
 		}
 
 		// Ensure we don't have a queue that gets out of control
@@ -285,25 +291,26 @@ module.exports = class Log extends IsoLog {
 	}
 
 	async flushLogs() {
+		debug('Logger: flushing logs')
 		if (!this.captureFELogs) {
-			this.trace('FE Metrics Capture Disabled')
+			debug('FE Metrics Capture Disabled')
 			this.logs = []
 			return
 		}
 
 		if (!this.adapter) {
-			this.warn(
+			debug(
 				'flushLogs: ...Unable to send because no adapter has been set. Ensure log.setOptions({appName, appEnv}) has been called'
 			)
 		} else if (this.logs.length > 0) {
 			try {
 				await this.adapter.sendLogs(this.logs)
 			} catch (e) {
-				this.warn(e)
+				console.log(e)
 			}
 			this.logs = []
 		} else {
-			this.trace('flushLogs: No metrics to send')
+			debug('flushLogs: No metrics to send')
 		}
 
 		// Ensure we don't have a queue that gets out of control
@@ -331,7 +338,7 @@ module.exports = class Log extends IsoLog {
 				hostname = hostname.replace('/', '')
 			}
 		} catch (e) {
-			this.warn(e)
+			debug(e)
 		}
 		return hostname
 	}
