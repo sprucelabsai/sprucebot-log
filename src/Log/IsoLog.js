@@ -86,7 +86,7 @@ module.exports = class Log {
 		} else {
 			this.traceTreeDepth = 3
 		}
-		this.useSourcemaps = true
+		this.useSourcemaps = false
 		this.sources = {}
 		this.sourceMaps = {}
 		this.originalPositionQueue = {}
