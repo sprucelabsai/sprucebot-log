@@ -51,28 +51,42 @@ module.exports = class Log {
 				bgHexFallBack: null
 			},
 			info: {
-				i: 3,
+				i: 2,
 				hex: '#0033cc',
 				hexFallBack: 'cyan',
 				bgHex: null,
 				bgHexFallBack: null
 			},
 			warn: {
-				i: 4,
+				i: 3,
 				hex: '#ff6600',
 				hexFallBack: 'red',
 				bgHex: null,
 				bgHexFallBack: null
 			},
 			error: {
+				i: 4,
+				hex: '#cc3300',
+				hexFallBack: 'red',
+				bgHex: null,
+				bgHexFallBack: null
+			},
+			crit: {
 				i: 5,
 				hex: '#cc3300',
 				hexFallBack: 'red',
 				bgHex: null,
 				bgHexFallBack: null
 			},
-			superInfo: {
+			fatal: {
 				i: 6,
+				hex: '#cc3300',
+				hexFallBack: 'red',
+				bgHex: null,
+				bgHexFallBack: null
+			},
+			superInfo: {
+				i: 7,
 				hex: '#0033cc',
 				hexFallBack: 'cyan',
 				bgHex: null,
@@ -156,6 +170,9 @@ module.exports = class Log {
 			case 'info':
 			case 'warn':
 			case 'error':
+			case 'crit':
+			case 'fatal':
+			case 'superInfo':
 				this.level = level
 				break
 			default:
@@ -602,11 +619,11 @@ module.exports = class Log {
 	}
 
 	crit() {
-		this.doLog('error', arguments)
+		this.doLog('crit', arguments)
 	}
 
 	fatal() {
-		this.doLog('error', arguments)
+		this.doLog('fatal', arguments)
 	}
 
 	superInfo() {

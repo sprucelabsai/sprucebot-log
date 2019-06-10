@@ -374,13 +374,13 @@ module.exports = class Log extends IsoLog {
 	}
 
 	crit() {
-		this.trackLog('error', arguments)
-		this.doLog('error', arguments, this.captureFELogs)
+		this.trackLog('crit', arguments)
+		this.doLog('crit', arguments, this.captureFELogs)
 	}
 
 	fatal() {
-		this.trackLog('error', arguments)
-		this.doLog('error', arguments, this.captureFELogs)
+		this.trackLog('fatal', arguments)
+		this.doLog('fatal', arguments, this.captureFELogs)
 	}
 
 	superInfo() {
