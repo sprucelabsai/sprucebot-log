@@ -1,8 +1,10 @@
 // @flow
 // Modified version of https://github.com/barbershop/iso-log
+const debug = require('debug')('@sprucelabs/log')
 const chalk = require('chalk')
 const sourceMap = require('source-map')
 const request = require('superagent')
+const winston = require('winston')
 
 let fs
 const CLIENT =
@@ -16,6 +18,7 @@ module.exports = class Log {
 	useTrace: boolean
 	useSourcemaps: boolean
 	useColors: boolean
+	asJSON: boolean
 	level: string
 	levels: Object
 	sources: Object
@@ -48,28 +51,42 @@ module.exports = class Log {
 				bgHexFallBack: null
 			},
 			info: {
-				i: 3,
+				i: 2,
 				hex: '#0033cc',
 				hexFallBack: 'cyan',
 				bgHex: null,
 				bgHexFallBack: null
 			},
 			warn: {
-				i: 4,
+				i: 3,
 				hex: '#ff6600',
 				hexFallBack: 'red',
 				bgHex: null,
 				bgHexFallBack: null
 			},
 			error: {
+				i: 4,
+				hex: '#cc3300',
+				hexFallBack: 'red',
+				bgHex: null,
+				bgHexFallBack: null
+			},
+			crit: {
 				i: 5,
 				hex: '#cc3300',
 				hexFallBack: 'red',
 				bgHex: null,
 				bgHexFallBack: null
 			},
-			superInfo: {
+			fatal: {
 				i: 6,
+				hex: '#cc3300',
+				hexFallBack: 'red',
+				bgHex: null,
+				bgHexFallBack: null
+			},
+			superInfo: {
+				i: 7,
 				hex: '#0033cc',
 				hexFallBack: 'cyan',
 				bgHex: null,
@@ -78,37 +95,49 @@ module.exports = class Log {
 		}
 
 		this.useTrace = true
-		this.useSourcemaps = true
+		if (CLIENT) {
+			this.traceTreeDepth = 2
+		} else {
+			this.traceTreeDepth = 3
+		}
+		this.useSourcemaps = false
 		this.sources = {}
 		this.sourceMaps = {}
 		this.originalPositionQueue = {}
 		this.useColors = true
+		this.asJSON = false
 		global.sources = this.sources
 		global.sourceMaps = this.sourceMaps
 		this.logs = []
+		this.setupWinston()
 	}
 
 	setOptions(options: {
 		level?: string,
+		formatters?: Array<any>,
+		transports?: Array<any>,
 		useTrace?: boolean,
+		asJSON?: boolean,
 		useSourcemaps?: boolean,
 		useColors?: boolean,
 		userAgent: string
 	}) {
+		debug('Initializing options', { options })
+
 		if (options.level) {
 			this.setLevel(options.level)
 		}
 
-		if (options.useTrace === false) {
-			this.useTrace = false
-		} else {
+		if (options.useTrace === true) {
 			this.useTrace = true
+		} else {
+			this.useTrace = false
 		}
 
-		if (options.useSourcemaps === false) {
-			this.useSourcemaps = false
-		} else {
+		if (options.useSourcemaps === true) {
 			this.useSourcemaps = true
+		} else {
+			this.useSourcemaps = false
 		}
 
 		if (options.useColors === false) {
@@ -118,6 +147,20 @@ module.exports = class Log {
 		}
 
 		this.userAgent = options.userAgent || 'unknown'
+
+		if (typeof options.asJSON !== 'undefined') {
+			this.asJSON = options.asJSON === true
+		}
+
+		if (options.transports && Array.isArray(options.transports)) {
+			this.customTransports = options.transports
+		}
+
+		if (options.formatters && Array.isArray(options.formatters)) {
+			this.customFormatters = options.formatters
+		}
+
+		this.setupWinston()
 	}
 
 	setLevel(level: string) {
@@ -127,12 +170,100 @@ module.exports = class Log {
 			case 'info':
 			case 'warn':
 			case 'error':
+			case 'crit':
+			case 'fatal':
+			case 'superInfo':
 				this.level = level
 				break
 			default:
 				this.level = 'warn'
 				break
 		}
+	}
+
+	setupWinston() {
+		debug('Setting up new winston logger', { level: this.level })
+
+		const customLevels = {
+			levels: {
+				trace: 7,
+				debug: 6,
+				info: 5,
+				warn: 4,
+				error: 3,
+				crit: 2,
+				fatal: 1,
+				superInfo: 0
+			},
+			colors: {
+				trace: 'gray',
+				debug: 'green',
+				info: 'cyan',
+				warn: 'yellow',
+				error: 'red',
+				crit: 'red',
+				fatal: 'red',
+				superInfo: 'cyan'
+			}
+		}
+
+		winston.addColors(customLevels.colors)
+
+		const transports = this.customTransports || [
+			new winston.transports.Console()
+		]
+		let formatters = []
+		if (this.useColors) {
+			formatters.push(winston.format.colorize({ all: this.useColors }))
+		}
+
+		formatters.push(
+			winston.format.timestamp({
+				format: 'YYYY-MM-DD HH:mm:ss:SSS'
+			})
+		)
+
+		if (this.asJSON) {
+			formatters.push(winston.format.json())
+		} else {
+			formatters.push(
+				winston.format.printf(info => {
+					// Available data passed through to custom formatter. Note that SOME OF THESE ITEMS MAY NOT BE DEFINED.
+					// The only info items guarenteed to be set are "message" and "level"
+					//
+					// info.message - This is a string that has the log message(s). If an object was passed as any log argument it will all be stringified into info.message
+					// info.level - The log level for the message. Levels are (lowest -> highest): trace, debug, info, warn, error, crit, fatal, superInfo
+					// info.timestamp - The timestamp (see above for formatting)
+					// info.thingType - The type of the item being logged
+					// info.callerFunc - Detailed info on where this log was called from if useTrace=true. This combines the source path, filename, line number, and column. It will also take into account sourcemaps if enabled.
+					// info.sourceRoot - The path to the source file where the log was called if useTrace=true
+					// info.sourceFile - The source filename where the log was called if useTrace=true
+					// info.mapFile - The filename of the sourcemap file
+					// info.lineNumber - The line number this log was called on
+					// info.position - The column / position of where the log was called
+					// info.originalFile - The original filename where the log was called from if using sourcemaps
+					// info.originalLine - The original line where the log was called from if using sourcemaps
+					// info.originalColumn - The original column where the log was called from if using sourcemaps
+
+					return `${info.timestamp} ${info.level} (${info.thingType}):${
+						info.callerFunc ? ` (${info.callerFunc})` : ''
+					} ${info.message}`
+				})
+			)
+		}
+
+		if (this.customFormatters) {
+			formatters = this.customFormatters
+		}
+
+		const logger = winston.createLogger({
+			level: this.level || 'warn',
+			levels: customLevels.levels,
+			transports,
+			format: winston.format.combine(...formatters)
+		})
+
+		this.winstonLogger = logger
 	}
 
 	doLog(level: string, args: any, saveLog: boolean) {
@@ -164,76 +295,130 @@ module.exports = class Log {
 
 			const thingType = typeof thingToLog
 			this.getLine()
-				.then(callerFunc => {
-					let isString = false
-					if (thingType === 'string') {
-						thingToLog = this.colorize(level, thingToLog, true)
-						isString = true
-					}
-
-					// default noop
-					let consoleMethod = () => {}
-					if (typeof console !== 'undefined') {
-						if (
-							!CLIENT &&
-							level === 'debug' &&
-							typeof console.log !== 'undefined'
-						) {
-							// Node has a dummy 'debug' console method (in v8) that doesn't print anything to console.  Use console.log instead
-							consoleMethod = console.log
-						} else if (typeof console[level] !== 'undefined') {
-							consoleMethod = console[level]
-						} else if (typeof console.log !== 'undefined') {
-							consoleMethod = console.log
+				.then(
+					({
+						callerFunc,
+						sourceRoot,
+						sourceFile,
+						mapFile,
+						lineNumber,
+						position,
+						originalFile,
+						originalLine,
+						originalColumn
+					}) => {
+						// default noop
+						let consoleMethod = () => {}
+						if (typeof console !== 'undefined') {
+							if (
+								!CLIENT &&
+								level === 'debug' &&
+								typeof console.log !== 'undefined'
+							) {
+								// Node has a dummy 'debug' console method (in v8) that doesn't print anything to console.  Use console.log instead
+								consoleMethod = console.log
+							} else if (typeof console[level] !== 'undefined') {
+								consoleMethod = console[level]
+							} else if (typeof console.log !== 'undefined') {
+								consoleMethod = console.log
+							}
 						}
-					}
 
-					const rawAboutStr = callerFunc
-						? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): `
-						: `(${level.toUpperCase()} | ${now} | ${thingType}): `
+						const rawAboutStr = callerFunc
+							? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): `
+							: `(${level.toUpperCase()} | ${now} | ${thingType}): `
 
-					const aboutStr = this.decorateLogMessage(level, rawAboutStr)
+						const aboutStr = this.decorateLogMessage(level, rawAboutStr)
 
-					const colorizedLevel = this.colorize(level, aboutStr)
+						const colorizedLevel = this.colorize(level, aboutStr)
 
-					if (isString) {
 						if (CLIENT) {
-							thingToLog[0] = colorizedLevel[0] + thingToLog[0]
-							thingToLog[2] = thingToLog[1]
-							thingToLog[1] = colorizedLevel[1]
-						} else {
-							thingToLog = colorizedLevel + thingToLog
+							console.log.apply(this, colorizedLevel)
 						}
-					} else if (CLIENT) {
-						console.log.apply(this, colorizedLevel)
-					} else {
-						console.log.call(this, colorizedLevel)
-					}
 
-					if (!CLIENT && thingType === 'string') {
-						consoleMethod.call(this, thingToLog)
-					} else {
-						consoleMethod.apply(this, thingToLog)
-					}
+						if (CLIENT) {
+							if (thingType === 'string') {
+								consoleMethod.call(this, thingToLog)
+							} else {
+								consoleMethod.apply(this, thingToLog)
+							}
+						} else {
+							if (
+								!this.asJSON &&
+								!this.customFormatters &&
+								thingType !== 'string'
+							) {
+								try {
+									thingToLog = `\n${JSON.stringify(
+										thingToLog,
+										this.replaceErrors,
+										4
+									)}`
+								} catch (e) {
+									debug('Error stringifying thingToLog', e)
+								}
+							} else if (
+								this.asJSON &&
+								!this.customFormatters &&
+								thingType !== 'string'
+							) {
+								try {
+									// Stringify the log so it can properly get Error object properties and then re-parse it to JSON
+									thingToLog = JSON.parse(
+										`${JSON.stringify(thingToLog, this.replaceErrors)}`
+									)
+								} catch (e) {
+									debug('Error stringifying thingToLog', e)
+								}
+							}
 
-					if (saveLog && CLIENT && this.logs && Array.isArray(this.logs)) {
-						this.logs.push({
-							userAgent: this.userAgent,
-							path:
-								window && window.location && window.location.pathname
-									? window.location.pathname
-									: 'unknown',
-							about: rawAboutStr,
-							level,
-							item: rawThingToLog
-						})
+							this.winstonLogger[level](thingToLog, {
+								thingType,
+								callerFunc,
+								sourceRoot,
+								sourceFile,
+								mapFile,
+								lineNumber,
+								position,
+								originalFile,
+								originalLine,
+								originalColumn
+							})
+						}
+
+						if (saveLog && CLIENT && this.logs && Array.isArray(this.logs)) {
+							const thingToSave = JSON.parse(
+								`${JSON.stringify(rawThingToLog, this.replaceErrors)}`
+							)
+
+							this.logs.push({
+								userAgent: this.userAgent,
+								path:
+									window && window.location && window.location.pathname
+										? window.location.pathname
+										: 'unknown',
+								timestamp: now,
+								level,
+								item: thingToSave,
+								thingType,
+								callerFunc,
+								sourceRoot,
+								sourceFile,
+								mapFile,
+								lineNumber,
+								position,
+								originalFile,
+								originalLine,
+								originalColumn
+							})
+						}
 					}
-				})
+				)
 				.catch(e => {
 					console.warn(e)
 				})
 		} else {
-			// console.log('**** LOG LEVEL NOT MET');
+			debug('Log suppressed because log level was not met', { level, args })
 		}
 	}
 
@@ -285,21 +470,12 @@ module.exports = class Log {
 
 			colorizedStr = [`%c${str}`, style]
 		} else {
-			// if (chalk.hex) {
-			// 	if (this.levels[level].bgHex) {
-			// 		colorizedStr = chalk.bgHex(this.levels[level].bgHex)(colorizedStr);
-			// 	}
-			// 	if (this.levels[level].hex) {
-			// 		colorizedStr = chalk.hex(this.levels[level].hex)(colorizedStr);
-			// 	}
-			// } else {
 			if (this.levels[level].bgHexFallBack) {
 				colorizedStr = chalk[this.levels[level].bgHexFallBack](colorizedStr)
 			}
 			if (this.levels[level].hexFallBack) {
 				colorizedStr = chalk[this.levels[level].hexFallBack](colorizedStr)
 			}
-			// }
 			if (bold) {
 				colorizedStr = chalk.bold(colorizedStr)
 			}
@@ -310,7 +486,9 @@ module.exports = class Log {
 	getLine(): Promise<?string> {
 		return new Promise(resolve => {
 			if (!this.useTrace) {
-				resolve()
+				debug('Suppressing file / line numbers because useTrace === false')
+				resolve({})
+				return
 			}
 
 			let callerFunc = ''
@@ -331,6 +509,7 @@ module.exports = class Log {
 					const matches2 = matches[depth].match(
 						/at (.*)\((.*\/)(.*\.js):([^:]*):([^:]*)\)\n$/
 					)
+
 					if (matches2 && matches2[1]) {
 						const sourceRoot = matches2[2]
 						const sourceFile = matches2[3]
@@ -338,10 +517,31 @@ module.exports = class Log {
 						const lineNumber = matches2[4]
 						const position = matches2[5]
 
+						const sourceRootPaths = sourceRoot && sourceRoot.split('/')
+
+						let lastSourceRootPath = ''
+
+						if (sourceRootPaths && sourceRootPaths.length > 1) {
+							for (let i = 0; i < this.traceTreeDepth; i += 1) {
+								if (sourceRootPaths[sourceRootPaths.length - 1 - i]) {
+									lastSourceRootPath = `${
+										sourceRootPaths[sourceRootPaths.length - 1 - i]
+									}/${lastSourceRootPath}`
+								}
+							}
+						}
+
 						if (!this.useSourcemaps) {
 							// Do not try to resolve from sourcemap.  Just use
-							callerFunc = `${sourceFile}:${lineNumber}:}`
-							return resolve(callerFunc)
+							callerFunc = `/${lastSourceRootPath}${sourceFile}:${lineNumber}:${position}`
+							return resolve({
+								callerFunc,
+								sourceRoot,
+								sourceFile,
+								mapFile,
+								lineNumber,
+								position
+							})
 						}
 
 						this.getSource({
@@ -358,20 +558,37 @@ module.exports = class Log {
 									originalFile = originalMatches[1]
 								}
 
-								callerFunc = `${originalFile}:${original.line}:${
-									original.column
-								}`
-								return resolve(callerFunc)
+								callerFunc = `/${lastSourceRootPath}${originalFile}:${original.line}:${original.column}`
+								return resolve({
+									callerFunc,
+									sourceRoot,
+									sourceFile,
+									mapFile,
+									lineNumber,
+									position,
+									originalFile,
+									originalLine: original.line,
+									originalColumn: original.column
+								})
 							}
 
 							callerFunc = `${matches2[1]} | ${matches2[2]}`
-							return resolve(callerFunc)
+							return resolve({
+								callerFunc,
+								sourceRoot,
+								sourceFile,
+								mapFile,
+								lineNumber,
+								position
+							})
 						})
 					} else {
-						return resolve()
+						debug('Unable to parse stack trace to get file / line number')
+						return resolve({})
 					}
 				} else {
-					return resolve()
+					debug('Unable to get stack trace for file / line number')
+					return resolve({})
 				}
 			}
 		})
@@ -402,11 +619,11 @@ module.exports = class Log {
 	}
 
 	crit() {
-		this.doLog('error', arguments)
+		this.doLog('crit', arguments)
 	}
 
 	fatal() {
-		this.doLog('error', arguments)
+		this.doLog('fatal', arguments)
 	}
 
 	superInfo() {
@@ -539,5 +756,19 @@ module.exports = class Log {
 				break
 		}
 		return logStr
+	}
+
+	replaceErrors(key, value) {
+		if (value instanceof Error) {
+			let error = {}
+
+			Object.getOwnPropertyNames(value).forEach(function(key) {
+				error[key] = value[key]
+			})
+
+			return error
+		}
+
+		return value
 	}
 }

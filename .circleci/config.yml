@@ -42,6 +42,12 @@ workflows:
   version: 2
   do_build:
     jobs:
+      - test:
+          filters:
+            branches:
+              ignore:
+                - dev
+                - master
       - dev_release:
           filters:
             branches:
