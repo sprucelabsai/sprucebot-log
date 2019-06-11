@@ -1,3 +1,10 @@
+# [2.0.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.8.2...v2.0.0) (2019-06-11)
+
+
+### Breaking Changes
+
+* Integrate winston server side; adjust log formatting; change defaults for better performance ([b10f6c7](https://github.com/sprucelabsai/sprucebot-log/commit/b10f6c7))
+
 ## [1.8.2](https://github.com/sprucelabsai/sprucebot-log/compare/v1.8.1...v1.8.2) (2019-01-14)
 
 
