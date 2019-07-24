@@ -53,7 +53,7 @@ module.exports = class Log extends IsoLog {
 	captureFELogs: boolean
 	logUrl: ?string
 
-	constructor() {
+	constructor(options) {
 		super()
 		this.setLevel('warn')
 		this.flushInterval = 10000
@@ -64,6 +64,10 @@ module.exports = class Log extends IsoLog {
 		setInterval(this.flushData.bind(this), this.flushInterval)
 
 		this.metricsQueue = []
+
+		if (options) {
+			this.setOptions(options)
+		}
 	}
 
 	setOptions(options: {
@@ -344,19 +348,19 @@ module.exports = class Log extends IsoLog {
 	}
 
 	trackLog(level: string, args: any) {
-		this.metric(`log-${level}`)
+		return this.metric(`log-${level}`)
 	}
 
 	trace() {
-		this.doLog('trace', arguments)
+		return this.doLog('trace', arguments)
 	}
 
 	debug() {
-		this.doLog('debug', arguments)
+		return this.doLog('debug', arguments)
 	}
 
 	log() {
-		this.doLog('log', arguments)
+		return this.doLog('log', arguments)
 	}
 
 	info() {
@@ -365,25 +369,25 @@ module.exports = class Log extends IsoLog {
 
 	warn() {
 		this.trackLog('warn', arguments)
-		this.doLog('warn', arguments, this.captureFELogs)
+		return this.doLog('warn', arguments, this.captureFELogs)
 	}
 
 	error() {
 		this.trackLog('error', arguments)
-		this.doLog('error', arguments, this.captureFELogs)
+		return this.doLog('error', arguments, this.captureFELogs)
 	}
 
 	crit() {
 		this.trackLog('crit', arguments)
-		this.doLog('crit', arguments, this.captureFELogs)
+		return this.doLog('crit', arguments, this.captureFELogs)
 	}
 
 	fatal() {
 		this.trackLog('fatal', arguments)
-		this.doLog('fatal', arguments, this.captureFELogs)
+		return this.doLog('fatal', arguments, this.captureFELogs)
 	}
 
 	superInfo() {
-		this.doLog('superInfo', arguments)
+		return this.doLog('superInfo', arguments)
 	}
 }
