@@ -376,7 +376,6 @@ module.exports = class Log {
 								}
 							}
 
-							// console.log(thingToLog)
 							this.winstonLogger[level](thingToLog, {
 								thingType,
 								callerFunc,
