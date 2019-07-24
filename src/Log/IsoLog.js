@@ -27,7 +27,7 @@ module.exports = class Log {
 	logs: Array<any>
 	userAgent: string
 
-	constructor() {
+	constructor(options) {
 		this.levels = {
 			trace: {
 				i: 0,
@@ -109,7 +109,11 @@ module.exports = class Log {
 		global.sources = this.sources
 		global.sourceMaps = this.sourceMaps
 		this.logs = []
+
 		this.setupWinston()
+		if (options) {
+			this.setOptions(options)
+		}
 	}
 
 	setOptions(options: {
@@ -294,7 +298,7 @@ module.exports = class Log {
 			const now = this.getDatetimeString()
 
 			const thingType = typeof thingToLog
-			this.getLine()
+			return this.getLine()
 				.then(
 					({
 						callerFunc,
@@ -372,6 +376,7 @@ module.exports = class Log {
 								}
 							}
 
+							// console.log(thingToLog)
 							this.winstonLogger[level](thingToLog, {
 								thingType,
 								callerFunc,
@@ -418,7 +423,10 @@ module.exports = class Log {
 					console.warn(e)
 				})
 		} else {
-			debug('Log suppressed because log level was not met', { level, args })
+			debug('Log suppressed because log level was not met', {
+				level,
+				args
+			})
 		}
 	}
 
@@ -544,7 +552,7 @@ module.exports = class Log {
 							})
 						}
 
-						this.getSource({
+						return this.getSource({
 							sourceRoot,
 							sourceFile,
 							mapFile,
@@ -595,39 +603,39 @@ module.exports = class Log {
 	}
 
 	trace() {
-		this.doLog('trace', arguments)
+		return this.doLog('trace', arguments)
 	}
 
 	debug() {
-		this.doLog('debug', arguments)
+		return this.doLog('debug', arguments)
 	}
 
 	log() {
-		this.doLog('log', arguments)
+		return this.doLog('log', arguments)
 	}
 
 	info() {
-		this.doLog('info', arguments)
+		return this.doLog('info', arguments)
 	}
 
 	warn() {
-		this.doLog('warn', arguments)
+		return this.doLog('warn', arguments)
 	}
 
 	error() {
-		this.doLog('error', arguments)
+		return this.doLog('error', arguments)
 	}
 
 	crit() {
-		this.doLog('crit', arguments)
+		return this.doLog('crit', arguments)
 	}
 
 	fatal() {
-		this.doLog('fatal', arguments)
+		return this.doLog('fatal', arguments)
 	}
 
 	superInfo() {
-		this.doLog('superInfo', arguments)
+		return cthis.doLog('superInfo', arguments)
 	}
 
 	getSource({
