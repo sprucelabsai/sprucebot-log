@@ -15,7 +15,7 @@ class LoggingTests extends Base {
 	async lotsOfLogs() {
 		const log = new Logger({ level: 'debug' })
 		const loopCount = 100
-		const logCount = 100000
+		const logCount = 10000
 		const wordCount = 1000
 
 		console.log('starting heap usage', `${this.heapUsedMB()}MB`)
@@ -26,7 +26,7 @@ class LoggingTests extends Base {
 			if (i % loopCount === 0) {
 				const heapUsed = this.heapUsedMB()
 				console.log(`heap usage at ${i}`, `${heapUsed}MB`)
-				assert.isBelow(heapUsed, 75)
+				assert.isBelow(heapUsed, 100)
 			}
 		}
 	}

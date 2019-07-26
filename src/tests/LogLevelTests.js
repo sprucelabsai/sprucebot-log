@@ -2,7 +2,6 @@ const { assert } = require('chai')
 const faker = require('faker')
 const Base = require('./Base')
 const Logger = require('../Log/index')
-const TestTransport = require('./lib/TestTransport')
 global.log = new Logger()
 
 class LoggingTests extends Base {
@@ -119,11 +118,9 @@ class LoggingTests extends Base {
 				superInfo: 'cyan'
 			}
 		}
-		this.testTransport = new TestTransport()
 		log.setOptions({
 			level: 'trace',
-			useColors: false,
-			transports: [this.testTransport]
+			useColors: false
 		})
 	}
 
@@ -135,26 +132,24 @@ class LoggingTests extends Base {
 
 		log.setOptions({
 			level: logLevel,
-			useColors: false,
-			transports: [this.testTransport]
+			useColors: false
 		})
 
-		const callbackId = this.testTransport.subscribe(info => {
+		global.consoleCallback = logMessage => {
 			wasLogged = true
 			if (!shouldLog) {
 				throw new Error(
 					`Level ${level} should not log for log level ${logLevel}`
 				)
 			}
-			assert.equal(info.level, level)
-			assert.equal(info.message, message)
-		})
+			const levelRegexp = new RegExp(level, 'i')
+			assert.isTrue(levelRegexp.test(logMessage))
+			const messageRegexp = new RegExp(message, 'i')
+			assert.isTrue(messageRegexp.test(message))
+		}
 
 		log[level](message)
-		// Logs are async...give a brief wait to make sure it finishes logging before checks
-		await this.wait()
 		assert.equal(wasLogged, shouldLog)
-		this.testTransport.unsubscribe(callbackId)
 	}
 }
 

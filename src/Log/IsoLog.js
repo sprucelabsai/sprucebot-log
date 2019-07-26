@@ -188,7 +188,9 @@ module.exports = class Log {
 		const now = this.getDatetimeString()
 		// default noop
 		let consoleMethod = () => {}
-		if (typeof console !== 'undefined') {
+		if (process.env.TESTING === 'true' && global.consoleCallback) {
+			consoleMethod = global.consoleCallback
+		} else if (typeof console !== 'undefined') {
 			if (!CLIENT && level === 'debug' && typeof console.log !== 'undefined') {
 				// Node has a dummy 'debug' console method (in v8) that doesn't print anything to console.  Use console.log instead
 				consoleMethod = console.log
