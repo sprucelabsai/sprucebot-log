@@ -82,8 +82,7 @@
 		"semantic-release": "^15.10.6",
 		"supertest": "^3.0.0",
 		"typescript": "^3.4.1",
-		"uuid": "^3.3.2",
-		"winston-transport": "^4.3.0"
+		"uuid": "^3.3.2"
 	},
 	"author": "🌲🤖  SpruceLabs <hello@sprucelabs.api> (https://sprucelabs.ai)",
 	"contributors": [
