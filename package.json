@@ -28,14 +28,13 @@
 		"build:babel": "babel ./src --out-dir ./build",
 		"watch": "chokidar 'src/**/*.js' -c 'npm run build'",
 		"release": "semantic-release",
-		"test": "yarn run build && mocha --exit 'build/tests/**/*Tests.js'"
+		"test": "yarn run build && TESTING=true mocha --exit 'build/tests/**/*Tests.js'"
 	},
 	"dependencies": {
 		"@babel/cli": "^7.0.0",
 		"debug": "^4.1.1",
 		"socket.io": "^2.1.1",
-		"superagent": "^4.0.0-beta.5",
-		"winston": "^3.2.1"
+		"superagent": "^4.0.0-beta.5"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.0.0",

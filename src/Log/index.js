@@ -72,8 +72,6 @@ module.exports = class Log extends IsoLog {
 
 	setOptions(options: {
 		level?: string,
-		formatters?: Array<any>,
-		transports?: Array<any>,
 		flushAt?: number,
 		flushIntervalSec?: number,
 		appName?: string,

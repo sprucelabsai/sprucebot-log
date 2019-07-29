@@ -13,7 +13,9 @@ module.exports = class Base {
 
 	setup() {}
 
-	async beforeEach() {}
+	async beforeEach() {
+		global.consoleCallback = null
+	}
 
 	async afterEach() {}
 

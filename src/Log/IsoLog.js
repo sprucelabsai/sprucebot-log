@@ -4,7 +4,6 @@ const debug = require('debug')('@sprucelabs/log')
 const chalk = require('chalk')
 const sourceMap = require('source-map')
 const request = require('superagent')
-const winston = require('winston')
 
 let fs
 const CLIENT =
@@ -110,7 +109,6 @@ module.exports = class Log {
 		global.sourceMaps = this.sourceMaps
 		this.logs = []
 
-		this.setupWinston()
 		if (options) {
 			this.setOptions(options)
 		}
@@ -118,8 +116,6 @@ module.exports = class Log {
 
 	setOptions(options: {
 		level?: string,
-		formatters?: Array<any>,
-		transports?: Array<any>,
 		useTrace?: boolean,
 		asJSON?: boolean,
 		useSourcemaps?: boolean,
@@ -155,16 +151,6 @@ module.exports = class Log {
 		if (typeof options.asJSON !== 'undefined') {
 			this.asJSON = options.asJSON === true
 		}
-
-		if (options.transports && Array.isArray(options.transports)) {
-			this.customTransports = options.transports
-		}
-
-		if (options.formatters && Array.isArray(options.formatters)) {
-			this.customFormatters = options.formatters
-		}
-
-		this.setupWinston()
 	}
 
 	setLevel(level: string) {
@@ -185,89 +171,106 @@ module.exports = class Log {
 		}
 	}
 
-	setupWinston() {
-		debug('Setting up new winston logger', { level: this.level })
-
-		const customLevels = {
-			levels: {
-				trace: 7,
-				debug: 6,
-				info: 5,
-				warn: 4,
-				error: 3,
-				crit: 2,
-				fatal: 1,
-				superInfo: 0
-			},
-			colors: {
-				trace: 'gray',
-				debug: 'green',
-				info: 'cyan',
-				warn: 'yellow',
-				error: 'red',
-				crit: 'red',
-				fatal: 'red',
-				superInfo: 'cyan'
+	writeLog({
+		thingToLog,
+		level,
+		thingType,
+		callerFunc,
+		sourceRoot,
+		sourceFile,
+		mapFile,
+		lineNumber,
+		position,
+		originalFile,
+		originalLine,
+		originalColumn
+	}) {
+		const now = this.getDatetimeString()
+		// default noop
+		let consoleMethod = () => {}
+		if (process.env.TESTING === 'true' && global.consoleCallback) {
+			consoleMethod = global.consoleCallback
+		} else if (typeof console !== 'undefined') {
+			if (!CLIENT && level === 'debug' && typeof console.log !== 'undefined') {
+				// Node has a dummy 'debug' console method (in v8) that doesn't print anything to console.  Use console.log instead
+				consoleMethod = console.log
+			} else if (typeof console[level] !== 'undefined') {
+				consoleMethod = console[level]
+			} else if (typeof console.log !== 'undefined') {
+				consoleMethod = console.log
 			}
 		}
 
-		winston.addColors(customLevels.colors)
+		const rawAboutStr = callerFunc
+			? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): `
+			: `(${level.toUpperCase()} | ${now} | ${thingType}): `
 
-		const transports = this.customTransports || [
-			new winston.transports.Console()
-		]
-		let formatters = []
-		if (this.useColors) {
-			formatters.push(winston.format.colorize({ all: this.useColors }))
-		}
+		const aboutStr = this.decorateLogMessage(level, rawAboutStr)
 
-		formatters.push(
-			winston.format.timestamp({
-				format: 'YYYY-MM-DD HH:mm:ss:SSS'
-			})
-		)
+		const colorizedLevel = this.colorize(level, aboutStr)
 
-		if (this.asJSON) {
-			formatters.push(winston.format.json())
+		if (CLIENT) {
+			console.log.apply(this, colorizedLevel)
+			if (thingType === 'string') {
+				consoleMethod.call(this, thingToLog)
+			} else {
+				consoleMethod.apply(this, thingToLog)
+			}
 		} else {
-			formatters.push(
-				winston.format.printf(info => {
-					// Available data passed through to custom formatter. Note that SOME OF THESE ITEMS MAY NOT BE DEFINED.
-					// The only info items guarenteed to be set are "message" and "level"
-					//
-					// info.message - This is a string that has the log message(s). If an object was passed as any log argument it will all be stringified into info.message
-					// info.level - The log level for the message. Levels are (lowest -> highest): trace, debug, info, warn, error, crit, fatal, superInfo
-					// info.timestamp - The timestamp (see above for formatting)
-					// info.thingType - The type of the item being logged
-					// info.callerFunc - Detailed info on where this log was called from if useTrace=true. This combines the source path, filename, line number, and column. It will also take into account sourcemaps if enabled.
-					// info.sourceRoot - The path to the source file where the log was called if useTrace=true
-					// info.sourceFile - The source filename where the log was called if useTrace=true
-					// info.mapFile - The filename of the sourcemap file
-					// info.lineNumber - The line number this log was called on
-					// info.position - The column / position of where the log was called
-					// info.originalFile - The original filename where the log was called from if using sourcemaps
-					// info.originalLine - The original line where the log was called from if using sourcemaps
-					// info.originalColumn - The original column where the log was called from if using sourcemaps
+			if (this.asJSON) {
+				try {
+					const jsonThing = `${JSON.stringify(
+						{
+							timestamp: now,
+							level,
+							thingType,
+							callerFunc,
+							sourceRoot,
+							sourceFile,
+							mapFile,
+							lineNumber,
+							position,
+							originalFile,
+							originalLine,
+							originalColumn,
+							message: thingToLog
+						},
+						this.replaceErrors
+					)}`
 
-					return `${info.timestamp} ${info.level} (${info.thingType}):${
-						info.callerFunc ? ` (${info.callerFunc})` : ''
-					} ${info.message}`
-				})
-			)
+					thingToLog = this.colorize(level, jsonThing)
+				} catch (e) {
+					debug('Error stringifying thingToLog', e)
+				}
+			} else if (thingType === 'string') {
+				thingToLog = this.colorize(level, thingToLog)
+			} else {
+				try {
+					thingToLog = this.colorize(
+						level,
+						`${JSON.stringify(thingToLog, this.replaceErrors, 4)}`
+					)
+				} catch (e) {
+					debug('Error stringifying thingToLog', e)
+				}
+			}
 		}
 
-		if (this.customFormatters) {
-			formatters = this.customFormatters
+		if (CLIENT) {
+			if (thingType === 'string') {
+				thingToLog[0] = colorizedLevel[0] + thingToLog[0]
+				thingToLog[2] = thingToLog[1]
+				thingToLog[1] = colorizedLevel[1]
+				consoleMethod.call(this, thingToLog)
+			} else {
+				console.log.apply(this, colorizedLevel)
+				consoleMethod.call(this, thingToLog)
+			}
+		} else if (this.asJSON) {
+			consoleMethod.call(this, thingToLog)
+		} else {
+			consoleMethod.call(this, `${colorizedLevel}\n${thingToLog}`)
 		}
-
-		const logger = winston.createLogger({
-			level: this.level || 'warn',
-			levels: customLevels.levels,
-			transports,
-			format: winston.format.combine(...formatters)
-		})
-
-		this.winstonLogger = logger
 	}
 
 	doLog(level: string, args: any, saveLog: boolean) {
@@ -298,6 +301,33 @@ module.exports = class Log {
 			const now = this.getDatetimeString()
 
 			const thingType = typeof thingToLog
+			if (!this.useTrace) {
+				// No need to call an async function if we're not getting the log trace
+				this.writeLog({
+					thingToLog,
+					level,
+					thingType
+				})
+				if (saveLog && CLIENT && this.logs && Array.isArray(this.logs)) {
+					const thingToSave = JSON.parse(
+						`${JSON.stringify(rawThingToLog, this.replaceErrors)}`
+					)
+
+					this.logs.push({
+						userAgent: this.userAgent,
+						path:
+							window && window.location && window.location.pathname
+								? window.location.pathname
+								: 'unknown',
+						timestamp: now,
+						level,
+						item: thingToSave,
+						thingType
+					})
+				}
+				return
+			}
+
 			return this.getLine()
 				.then(
 					({
@@ -311,84 +341,20 @@ module.exports = class Log {
 						originalLine,
 						originalColumn
 					}) => {
-						// default noop
-						let consoleMethod = () => {}
-						if (typeof console !== 'undefined') {
-							if (
-								!CLIENT &&
-								level === 'debug' &&
-								typeof console.log !== 'undefined'
-							) {
-								// Node has a dummy 'debug' console method (in v8) that doesn't print anything to console.  Use console.log instead
-								consoleMethod = console.log
-							} else if (typeof console[level] !== 'undefined') {
-								consoleMethod = console[level]
-							} else if (typeof console.log !== 'undefined') {
-								consoleMethod = console.log
-							}
-						}
-
-						const rawAboutStr = callerFunc
-							? `(${level.toUpperCase()} | ${now} | ${callerFunc} | ${thingType}): `
-							: `(${level.toUpperCase()} | ${now} | ${thingType}): `
-
-						const aboutStr = this.decorateLogMessage(level, rawAboutStr)
-
-						const colorizedLevel = this.colorize(level, aboutStr)
-
-						if (CLIENT) {
-							console.log.apply(this, colorizedLevel)
-						}
-
-						if (CLIENT) {
-							if (thingType === 'string') {
-								consoleMethod.call(this, thingToLog)
-							} else {
-								consoleMethod.apply(this, thingToLog)
-							}
-						} else {
-							if (
-								!this.asJSON &&
-								!this.customFormatters &&
-								thingType !== 'string'
-							) {
-								try {
-									thingToLog = `\n${JSON.stringify(
-										thingToLog,
-										this.replaceErrors,
-										4
-									)}`
-								} catch (e) {
-									debug('Error stringifying thingToLog', e)
-								}
-							} else if (
-								this.asJSON &&
-								!this.customFormatters &&
-								thingType !== 'string'
-							) {
-								try {
-									// Stringify the log so it can properly get Error object properties and then re-parse it to JSON
-									thingToLog = JSON.parse(
-										`${JSON.stringify(thingToLog, this.replaceErrors)}`
-									)
-								} catch (e) {
-									debug('Error stringifying thingToLog', e)
-								}
-							}
-
-							this.winstonLogger[level](thingToLog, {
-								thingType,
-								callerFunc,
-								sourceRoot,
-								sourceFile,
-								mapFile,
-								lineNumber,
-								position,
-								originalFile,
-								originalLine,
-								originalColumn
-							})
-						}
+						this.writeLog({
+							thingToLog,
+							level,
+							thingType,
+							callerFunc,
+							sourceRoot,
+							sourceFile,
+							mapFile,
+							lineNumber,
+							position,
+							originalFile,
+							originalLine,
+							originalColumn
+						})
 
 						if (saveLog && CLIENT && this.logs && Array.isArray(this.logs)) {
 							const thingToSave = JSON.parse(
@@ -735,6 +701,9 @@ module.exports = class Log {
 	}
 
 	decorateLogMessage(level: string, msg: string) {
+		if (!this.useColors) {
+			return msg
+		}
 		let logStr = msg
 		switch (level) {
 			case 'info':
@@ -770,7 +739,11 @@ module.exports = class Log {
 			let error = {}
 
 			Object.getOwnPropertyNames(value).forEach(function(key) {
-				error[key] = value[key]
+				if (key === 'stack') {
+					error[key] = value[key].split('\n')
+				} else {
+					error[key] = value[key]
+				}
 			})
 
 			return error

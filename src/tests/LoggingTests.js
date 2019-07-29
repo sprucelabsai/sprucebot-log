@@ -2,7 +2,6 @@ const { assert } = require('chai')
 const faker = require('faker')
 const Base = require('./Base')
 const Logger = require('../Log/index')
-const TestTransport = require('./lib/TestTransport')
 global.log = new Logger()
 
 class LoggingTests extends Base {
@@ -14,48 +13,40 @@ class LoggingTests extends Base {
 
 	async before() {
 		await super.before()
-		this.testTransport = new TestTransport()
 		log.setOptions({
-			level: 'debug',
-			transports: [this.testTransport]
+			level: 'debug'
 		})
 	}
 
 	async useColors() {
-		const message = faker.lorem.words()
 		let wasLogged = false
-		const callbackId = this.testTransport.subscribe(info => {
+		global.consoleCallback = logMessage => {
+			console.log(logMessage)
+			assert.isTrue(/\[32/.test(logMessage))
 			wasLogged = true
-			assert.isFalse(/^debug/.test(info.level))
-		})
+		}
+		const message = faker.lorem.words()
 
 		log.debug(message)
-		// Logs are async...give a brief wait to make sure it finishes logging before checks
-		await this.wait()
 		assert.isTrue(wasLogged)
-		this.testTransport.unsubscribe(callbackId)
 	}
 
 	async noColors() {
 		log.setOptions({
 			level: 'debug',
-			useColors: false,
-			transports: [this.testTransport]
+			useColors: false
 		})
 
-		const message = faker.lorem.words()
 		let wasLogged = false
-		const callbackId = this.testTransport.subscribe(info => {
+		global.consoleCallback = logMessage => {
+			console.log(logMessage)
+			assert.isFalse(/\[32/.test(logMessage))
 			wasLogged = true
-			assert.isTrue(/^debug/.test(info.level))
-			assert.equal(info.message, message)
-		})
+		}
+		const message = faker.lorem.words()
 
 		log.debug(message)
-		// Logs are async...give a brief wait to make sure it finishes logging before checks
-		await this.wait()
 		assert.isTrue(wasLogged)
-		this.testTransport.unsubscribe(callbackId)
 	}
 }
 
