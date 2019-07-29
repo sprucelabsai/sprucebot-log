@@ -1,3 +1,15 @@
+# [2.1.0](https://github.com/sprucelabsai/sprucebot-log/compare/v2.0.0...v2.1.0) (2019-07-29)
+
+
+### Bug Fixes
+
+* remove winston to optimize logging ([1bf9542](https://github.com/sprucelabsai/sprucebot-log/commit/1bf9542))
+
+
+### Features
+
+* remove winston ([015535e](https://github.com/sprucelabsai/sprucebot-log/commit/015535e))
+
 ## [2.0.1](https://github.com/sprucelabsai/sprucebot-log/compare/v2.0.0...v2.0.1) (2019-07-24)
 
 # [2.0.0](https://github.com/sprucelabsai/sprucebot-log/compare/v1.8.2...v2.0.0) (2019-06-11)
