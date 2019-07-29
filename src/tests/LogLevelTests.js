@@ -4,7 +4,7 @@ const Base = require('./Base')
 const Logger = require('../Log/index')
 global.log = new Logger()
 
-class LoggingTests extends Base {
+class LogLevelTests extends Base {
 	setup() {
 		it('Handle log=trace, level=trace', () => this.handleLog('trace', 'trace'))
 		it('Handle log=trace, level=debug', () => this.handleLog('trace', 'debug'))
@@ -153,7 +153,7 @@ class LoggingTests extends Base {
 	}
 }
 
-describe('LoggingTests', function Tests() {
+describe('LogLevelTests', function Tests() {
 	this.timeout(30000)
-	new LoggingTests() // eslint-disable-line
+	new LogLevelTests() // eslint-disable-line
 })
