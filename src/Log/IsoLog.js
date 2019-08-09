@@ -254,6 +254,12 @@ module.exports = class Log {
 					debug('Error stringifying thingToLog', e)
 				}
 			}
+
+			if (this.asJSON) {
+				consoleMethod.call(this, thingToLog)
+			} else {
+				consoleMethod.call(this, `${colorizedLevel}\n${thingToLog}`)
+			}
 		}
 	}
 
