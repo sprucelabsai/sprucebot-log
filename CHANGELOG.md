@@ -1,3 +1,11 @@
+## [2.1.1](https://github.com/sprucelabsai/sprucebot-log/compare/v2.1.0...v2.1.1) (2019-08-09)
+
+
+### Bug Fixes
+
+* old code causing error on FE logs ([9159375](https://github.com/sprucelabsai/sprucebot-log/commit/9159375))
+* old code causing error on FE logs ([ec8c7ae](https://github.com/sprucelabsai/sprucebot-log/commit/ec8c7ae))
+
 # [2.1.0](https://github.com/sprucelabsai/sprucebot-log/compare/v2.0.0...v2.1.0) (2019-07-29)
 
 
