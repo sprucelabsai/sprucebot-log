@@ -254,22 +254,12 @@ module.exports = class Log {
 					debug('Error stringifying thingToLog', e)
 				}
 			}
-		}
 
-		if (CLIENT) {
-			if (thingType === 'string') {
-				thingToLog[0] = colorizedLevel[0] + thingToLog[0]
-				thingToLog[2] = thingToLog[1]
-				thingToLog[1] = colorizedLevel[1]
+			if (this.asJSON) {
 				consoleMethod.call(this, thingToLog)
 			} else {
-				console.log.apply(this, colorizedLevel)
-				consoleMethod.call(this, thingToLog)
+				consoleMethod.call(this, `${colorizedLevel}\n${thingToLog}`)
 			}
-		} else if (this.asJSON) {
-			consoleMethod.call(this, thingToLog)
-		} else {
-			consoleMethod.call(this, `${colorizedLevel}\n${thingToLog}`)
 		}
 	}
 
