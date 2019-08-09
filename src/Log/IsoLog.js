@@ -255,22 +255,6 @@ module.exports = class Log {
 				}
 			}
 		}
-
-		if (CLIENT) {
-			if (thingType === 'string') {
-				thingToLog[0] = colorizedLevel[0] + thingToLog[0]
-				thingToLog[2] = thingToLog[1]
-				thingToLog[1] = colorizedLevel[1]
-				consoleMethod.call(this, thingToLog)
-			} else {
-				console.log.apply(this, colorizedLevel)
-				consoleMethod.call(this, thingToLog)
-			}
-		} else if (this.asJSON) {
-			consoleMethod.call(this, thingToLog)
-		} else {
-			consoleMethod.call(this, `${colorizedLevel}\n${thingToLog}`)
-		}
 	}
 
 	doLog(level: string, args: any, saveLog: boolean) {
