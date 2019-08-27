@@ -13,6 +13,7 @@
 	"main": "index.js",
 	"types": "./types/index.d.ts",
 	"files": [
+		"types",
 		"build",
 		"build-es6",
 		"client.js",
