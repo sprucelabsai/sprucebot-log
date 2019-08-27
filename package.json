@@ -11,6 +11,7 @@
 	},
 	"description": "Sprucebot Logger",
 	"main": "index.js",
+	"types": "./types/index.d.ts",
 	"files": [
 		"build",
 		"build-es6",
