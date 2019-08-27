@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/sprucelabsai/sprucebot-log/compare/v2.2.0...v2.2.1) (2019-08-27)
+
+
+### Bug Fixes
+
+* missing types/ dir from package files ([6161420](https://github.com/sprucelabsai/sprucebot-log/commit/6161420))
+
 # [2.2.0](https://github.com/sprucelabsai/sprucebot-log/compare/v2.1.1...v2.2.0) (2019-08-27)
 
 
