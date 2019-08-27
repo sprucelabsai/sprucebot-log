@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/sprucelabsai/sprucebot-log/compare/v2.1.1...v2.2.0) (2019-08-27)
+
+
+### Features
+
+* Add basic typescript definitions ([e4a4a19](https://github.com/sprucelabsai/sprucebot-log/commit/e4a4a19))
+
 ## [2.1.1](https://github.com/sprucelabsai/sprucebot-log/compare/v2.1.0...v2.1.1) (2019-08-09)
 
 
