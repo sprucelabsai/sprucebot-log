@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/sprucelabsai/sprucebot-log/compare/v2.2.2...v2.2.3) (2020-07-08)
+
+
+### Build System
+
+* **deps:** bump npm-registry-fetch from 4.0.0 to 4.0.5 ([0e7fe0f](https://github.com/sprucelabsai/sprucebot-log/commit/0e7fe0f))
+
 ## [2.2.2](https://github.com/sprucelabsai/sprucebot-log/compare/v2.2.1...v2.2.2) (2019-08-29)
 
 ## [2.2.1](https://github.com/sprucelabsai/sprucebot-log/compare/v2.2.0...v2.2.1) (2019-08-27)
