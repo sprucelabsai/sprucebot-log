@@ -81,7 +81,7 @@
 		"lodash": "^4.17.15",
 		"mocha": "^6.1.4",
 		"prettier": "^1.11.1",
-		"semantic-release": "^15.10.6",
+		"semantic-release": "^17.2.3",
 		"supertest": "^3.0.0",
 		"typescript": "^3.4.1",
 		"uuid": "^3.3.2"
